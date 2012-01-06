@@ -1,14 +1,14 @@
 # Makefile for client and server
 CC = gcc
-OBJCLI = client.c 
-OBJSRV = server.c
+OBJCLI = ftpc.c 
+OBJSRV = ftps.c
 CFLAGS = -ansi #-lxnet
 # setup for system
 LIBS =
-all: cli srv 
-cli:	$(OBJCLI)
+all: ftpc ftps
+ftpc:	$(OBJCLI)
 	$(CC) $(CFLAGS) -o $@ $(OBJCLI) $(LIBS)
-srv:	$(OBJSRV)
+ftps:	$(OBJSRV)
 	$(CC) $(CFLAGS) -o $@ $(OBJSRV) $(LIBS)
 clean:
 	rm cli srv *~

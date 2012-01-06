@@ -10,7 +10,7 @@
 #define port "1040"   /* socket file name */
 
 /* client program called with host name where server is run */
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	int sock;                     /* initial socket descriptor */
 	int  rval;                    /* returned value from a read */
@@ -21,9 +21,10 @@ main(int argc, char *argv[])
 
 
 	if(argc < 2) {
-		printf("usage: cli remote_host\n");
+		printf("Usage: ftpc <remote-IP> <remote-port> <loca-file-transfer>\n");
 		exit(1);
 	}
+
 
 	/* initialize socket connection in unix domain */
 	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
@@ -61,6 +62,7 @@ main(int argc, char *argv[])
 		exit(1);
 	}
 	printf("Client receives: %s\n", buf);
+	return 0;
 
 }
 
