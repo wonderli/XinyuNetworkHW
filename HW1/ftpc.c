@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #define port "1040"   /* socket file name */
-
+int file_send(int sck, char *file);
 /* client program called with host name where server is run */
 int main(int argc, char *argv[])
 {
@@ -65,4 +65,31 @@ int main(int argc, char *argv[])
 	return 0;
 
 }
-
+int file_send (int sck, char *file)
+{
+  int nread;
+  int send_file;
+  if (send_file = open (file, O_RDONLY) < 0)
+    {
+      perror ("File open error");
+      return 1;
+    }
+  bzero (rbuf1, MAXBUF);
+  for (;;)
+    {
+      if ((nread = read (send_file, rbuf1, MAXBUF)) < MAXBUF)
+	{
+	  send (sck, rbuf1, nread, 0);
+	  break;
+	}
+      else
+	send (sck, rbuf1, MAXBUF, 0);
+    }
+  close (send_file);
+  if (close (sck) < 0)
+    {
+      printf ("close error\n");
+      return 1;
+    }
+  return 0;
+}
