@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
 	int  rval;                    /* returned value from a read */
 	struct sockaddr_in sin_addr; /* structure for socket name 
 				      * setup */
-	char buf[1024] = "Hello in TCP from client";     /* message to set to server */
 	struct hostent *hp;
 	char filename[20];
 	if(argc < 2) {
@@ -61,10 +60,18 @@ int main(int argc, char *argv[])
 	}
 	printf("Client sends:    %s\n", buf);
 	*/
+	char *buf;
+	buf = (char*)malloc(MAXBUF);
 	if(read(sock, buf, MAXBUF) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	}
+	if (close (sock) < 0)
+	{
+		printf ("close socket error\n");
+		return 1;
+	}
+
 	printf("Client receives: %s\n", buf);
 	return 0;
 
@@ -82,7 +89,7 @@ int file_send (int sck, char *filename)
   int send_file;
   char *read_file_buf;
   read_file_buf = (char*) malloc(MAXBUF);
-  if (send_file = open (filename, O_RDONLY) < 0)
+  if ((send_file = open (filename, O_RDONLY) )< 0)
   {
 	  perror ("File open error");
 	  return 1;
@@ -93,19 +100,13 @@ int file_send (int sck, char *filename)
   printf("filename is %s\n", filename);
   bcopy(&file_size, read_file_buf, sizeof(int));
   bcopy(filename, read_file_buf+4, 20);
-  if ((nread = read (send_file, read_file_buf+24, MAXBUF)) < MAXBUF)
+  if ((nread = read (send_file, read_file_buf+24, 1000)) < 1000)
   {
-	  send (sck, read_file_buf+24, nread, 0);
+	  send (sck, read_file_buf, nread+24, 0);
   }
   else
-	  send (sck, read_file_buf+24, MAXBUF, 0);
+	  send (sck, read_file_buf, MAXBUF, 0);
     
-  printf("send content is %s\n", read_file_buf);
   close (send_file);
-  if (close (sck) < 0)
-    {
-      printf ("close socket error\n");
-      return 1;
-    }
   return 0;
 }

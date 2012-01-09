@@ -55,7 +55,6 @@ int main(void)
 
 	/* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);
-
 	/* read from msgsock and place in buf */
 	if(read(msgsock, buf, MAXBUF) < 0) {
 		perror("error reading on stream socket");
@@ -80,13 +79,17 @@ int main(void)
 	{
 		mkdir("recv",S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
 	}
-	if (fd = open(filepath, O_CREAT, mode) < 0)
+	if ((fd = open(filepath, O_WRONLY|O_CREAT, mode))< 0)
 	{
 		perror("File open error");
 		return 1;
 	}
 
-	write(fd,buf+24, MAXBUF);
+	if(write(fd,buf+24, MAXBUF) < 0)
+	{
+		perror("error on write file");
+		exit(1);
+	}
 	close(fd);
 	/* write message back to client */
 	char *buf2;
@@ -96,7 +99,8 @@ int main(void)
 		perror("error writing on stream socket");
 		exit(1);
 	}
-	printf("\n%s\n", buf2);
+	/*printf("\n%s\n", buf2);*/
+	printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size);
 	
 	/* close all connections and remove socket file */
 	close(msgsock);
