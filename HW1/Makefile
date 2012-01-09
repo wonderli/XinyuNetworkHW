@@ -7,9 +7,9 @@ CFLAGS = -ansi #-lxnet
 LIBS =
 all: ftpc ftps
 ftpc:	$(OBJCLI)
-	$(CC) $(CFLAGS) -o $@ $(OBJCLI) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJCLI) $(LIBS) -g
 ftps:	$(OBJSRV)
-	$(CC) $(CFLAGS) -o $@ $(OBJSRV) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJSRV) $(LIBS) -g
 clean:
-	rm cli srv *~
+	rm ftpc ftps *~
 

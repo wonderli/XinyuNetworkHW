@@ -8,8 +8,9 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
-#define port "1040"   /* socket file name */
+#define port "1050"   /* socket file name */
 #define MAXBUF 1024
 int file_send(int sck, char *file);
 /* client program called with host name where server is run */
@@ -21,16 +22,12 @@ int main(int argc, char *argv[])
 				      * setup */
 	char buf[1024] = "Hello in TCP from client";     /* message to set to server */
 	struct hostent *hp;
-
-
+	char filename[20];
 	if(argc < 2) {
 		printf("Usage: ftpc <remote-IP> <remote-port> <loca-file-transfer>\n");
 		exit(1);
 	}
-	char *filename = "Makefile";
-	printf("The Makefile size is %d", get_file_size(filename));
-
-
+	strcpy(filename, argv[2]);
 	/* initialize socket connection in unix domain */
 	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		perror("error openting datagram socket");
@@ -63,13 +60,12 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	printf("Client sends:    %s\n", buf);
-
+	*/
 	if(read(sock, buf, MAXBUF) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	}
 	printf("Client receives: %s\n", buf);
-	*/
 	return 0;
 
 }
@@ -80,27 +76,31 @@ int get_file_size(char *filename)
 	return file_stat.st_size;
 
 }
-int file_send (int sck, char *file)
+int file_send (int sck, char *filename)
 {
   int nread;
   int send_file;
   char *read_file_buf;
   read_file_buf = (char*) malloc(MAXBUF);
-  if (send_file = open (file, O_RDONLY) < 0)
-    {
-      perror ("File open error");
-      return 1;
-    }
+  if (send_file = open (filename, O_RDONLY) < 0)
+  {
+	  perror ("File open error");
+	  return 1;
+  }
   bzero(read_file_buf, MAXBUF);
-  int file_size = get_file_size(file);
+  int file_size = get_file_size(filename);
+  printf("filesize is %d\n", file_size);
+  printf("filename is %s\n", filename);
   bcopy(&file_size, read_file_buf, sizeof(int));
-  bcopy(file, read_file_buf+4, 20);
+  bcopy(filename, read_file_buf+4, 20);
   if ((nread = read (send_file, read_file_buf+24, MAXBUF)) < MAXBUF)
   {
 	  send (sck, read_file_buf+24, nread, 0);
   }
   else
 	  send (sck, read_file_buf+24, MAXBUF, 0);
+    
+  printf("send content is %s\n", read_file_buf);
   close (send_file);
   if (close (sck) < 0)
     {

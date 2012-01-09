@@ -3,14 +3,19 @@
 /* Server for accepting an Internet stream connection on port 1040 */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
-#define port "1040"   /* socket file name */
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#define port "1050"   /* socket file name */
+#define MAXBUF 1024
 
 /* server program called with no argument */
-main(void)
+int main(void)
 {
 	int sock;                     /* initial socket descriptor */
 	int msgsock;                  /* accepted socket descriptor,
@@ -18,9 +23,8 @@ main(void)
 				       *                                  * unique socket descriptor*/
 	int rval=1;                   /* returned value from a read */  
 	struct sockaddr_in sin_addr; /* structure for socket name setup */
-	char buf[1024];               /* buffer for holding read data */
-	char buf2[1024] = "Hello back in TCP from server"; 
-
+	char* buf;
+	buf = (char*)malloc(MAXBUF);
 	printf("TCP server waiting for remote connection from clients ...\n");
 
 	/*initialize socket connection in unix domain*/
@@ -50,24 +54,53 @@ main(void)
 	} 
 
 	/* put all zeros in buffer (clear) */
-	bzero(buf,1024);
+	bzero(buf,MAXBUF);
 
 	/* read from msgsock and place in buf */
-	if(read(msgsock, buf, 1024) < 0) {
+	if(read(msgsock, buf, MAXBUF) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	} 
 	printf("Server receives: %s\n", buf);
+	char *filename;
+	char *filepath;
+	int file_size = 0;
+	filename = (char*)malloc(20);
+	filepath = (char*)malloc(MAXBUF);
+	bcopy(buf, &file_size, sizeof(int));
+	bcopy(buf+4, filename, 20);
+	strcpy(filepath, "./recv/");
+	strcat(filepath, filename);
+	printf("The file length is %d\n", file_size);
+	printf("The file name is %s\n", filepath);
+	
+	int fd = 0;
+	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+	if(access("recv",F_OK) == -1)
+	{
+		mkdir("recv",S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	}
+	if (fd = open(filepath, O_CREAT, mode) < 0)
+	{
+		perror("File open error");
+		return 1;
+	}
 
+	write(fd,buf+24, MAXBUF);
+	close(fd);
 	/* write message back to client */
+	char *buf2;
+	buf2 = (char *)malloc(MAXBUF);
+	strcpy(buf2, "Transfer finished\n");
 	if(write(msgsock, buf2, 1024) < 0) {
 		perror("error writing on stream socket");
 		exit(1);
 	}
-	printf("Server sends:    %s\n", buf2);
-
+	printf("\n%s\n", buf2);
+	
 	/* close all connections and remove socket file */
 	close(msgsock);
 	close(sock);
+	return 0;
 }
 
