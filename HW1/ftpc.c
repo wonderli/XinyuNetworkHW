@@ -3,11 +3,14 @@
 /* Client for connecting to Internet stream server waiting on port 1040 */
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 #define port "1040"   /* socket file name */
+#define MAXBUF 1024
 int file_send(int sck, char *file);
 /* client program called with host name where server is run */
 int main(int argc, char *argv[])
@@ -24,6 +27,8 @@ int main(int argc, char *argv[])
 		printf("Usage: ftpc <remote-IP> <remote-port> <loca-file-transfer>\n");
 		exit(1);
 	}
+	char *filename = "Makefile";
+	printf("The Makefile size is %d", get_file_size(filename));
 
 
 	/* initialize socket connection in unix domain */
@@ -49,46 +54,57 @@ int main(int argc, char *argv[])
 		perror("error connecting stream socket");
 		exit(1);
 	}
+	file_send(sock,filename);
 
 	/* write buf to sock */
-	if(write(sock, buf, 1024) < 0) {
+	/*
+	if(write(sock, buf, MAXBUF) < 0) {
 		perror("error writing on stream socket");
 		exit(1);
 	}
 	printf("Client sends:    %s\n", buf);
 
-	if(read(sock, buf, 1024) < 0) {
+	if(read(sock, buf, MAXBUF) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	}
 	printf("Client receives: %s\n", buf);
+	*/
 	return 0;
+
+}
+int get_file_size(char *filename)
+{
+	struct stat file_stat;
+	if(stat(filename, &file_stat) != -1)
+	return file_stat.st_size;
 
 }
 int file_send (int sck, char *file)
 {
   int nread;
   int send_file;
+  char *read_file_buf;
+  read_file_buf = (char*) malloc(MAXBUF);
   if (send_file = open (file, O_RDONLY) < 0)
     {
       perror ("File open error");
       return 1;
     }
-  bzero (rbuf1, MAXBUF);
-  for (;;)
-    {
-      if ((nread = read (send_file, rbuf1, MAXBUF)) < MAXBUF)
-	{
-	  send (sck, rbuf1, nread, 0);
-	  break;
-	}
-      else
-	send (sck, rbuf1, MAXBUF, 0);
-    }
+  bzero(read_file_buf, MAXBUF);
+  int file_size = get_file_size(file);
+  bcopy(&file_size, read_file_buf, sizeof(int));
+  bcopy(file, read_file_buf+4, 20);
+  if ((nread = read (send_file, read_file_buf+24, MAXBUF)) < MAXBUF)
+  {
+	  send (sck, read_file_buf+24, nread, 0);
+  }
+  else
+	  send (sck, read_file_buf+24, MAXBUF, 0);
   close (send_file);
   if (close (sck) < 0)
     {
-      printf ("close error\n");
+      printf ("close socket error\n");
       return 1;
     }
   return 0;
