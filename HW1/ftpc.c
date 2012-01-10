@@ -11,7 +11,7 @@
 #include <string.h>
 #include <fcntl.h>
 #define port "1050"   /* socket file name */
-#define MAXBUF 1024
+#define MAXBUF 1000
 int file_send(int sck, char *file);
 /* client program called with host name where server is run */
 int main(int argc, char *argv[])
@@ -50,7 +50,12 @@ int main(int argc, char *argv[])
 		perror("error connecting stream socket");
 		exit(1);
 	}
-	file_send(sock,filename);
+	/* 
+	int file_size = get_file_size(filename);
+	printf("filesize is %d\n", file_size);
+	printf("filename is %s\n", filename);
+	*/
+	file_send(sock,filename);  
 
 	/* write buf to sock */
 	/*
@@ -78,10 +83,28 @@ int main(int argc, char *argv[])
 }
 int get_file_size(char *filename)
 {
+	/*
 	struct stat file_stat;
 	if(stat(filename, &file_stat) != -1)
 	return file_stat.st_size;
-
+	*/
+	FILE *fp;
+	int start = 0; //Read start point
+	int file_size = 0;
+	fp = fopen(filename, "rb");
+	if(fp == NULL)
+	{
+		perror("File not found!!!");
+	}
+	else
+	{
+		start = ftell(fp);
+		fseek(fp, 0L, SEEK_END);
+		file_size = ftell(fp);
+		fseek(fp, start,SEEK_SET);
+	}
+	fclose(fp);
+	return file_size;
 }
 int file_send (int sck, char *filename)
 {
@@ -100,13 +123,34 @@ int file_send (int sck, char *filename)
   printf("filename is %s\n", filename);
   bcopy(&file_size, read_file_buf, sizeof(int));
   bcopy(filename, read_file_buf+4, 20);
-  if ((nread = read (send_file, read_file_buf+24, 1000)) < 1000)
+  if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF - 24))
+  {
+	  send (sck, read_file_buf, nread+24, 0);
+  }
+  else if (nread == (MAXBUF -24))
+  {
+	  send (sck, read_file_buf, nread+24, 0);
+
+	  for(;;)
+	  {
+		  if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
+		  {
+			  send (sck, read_file_buf, nread, 0);
+			  //printf("The nread is %d", nread);
+			  break;
+		  }
+		  else
+			  send (sck, read_file_buf, MAXBUF, 0);
+	  } 
+  }
+  /*
+  if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF - 24))
   {
 	  send (sck, read_file_buf, nread+24, 0);
   }
   else
 	  send (sck, read_file_buf, MAXBUF, 0);
-    
+  */
   close (send_file);
   return 0;
 }

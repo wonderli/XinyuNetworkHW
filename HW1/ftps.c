@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <string.h>
 #define port "1050"   /* socket file name */
-#define MAXBUF 1024
+#define MAXBUF 1000
 
 /* server program called with no argument */
 int main(void)
@@ -56,7 +56,8 @@ int main(void)
 	/* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);
 	/* read from msgsock and place in buf */
-	if(read(msgsock, buf, MAXBUF) < 0) {
+	int nread = 0; /* the number read from socket*/
+	if((nread = read(msgsock, buf, MAXBUF)) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	} 
@@ -72,7 +73,7 @@ int main(void)
 	strcat(filepath, filename);
 	printf("The file length is %d\n", file_size);
 	printf("The file name is %s\n", filepath);
-	
+	/*Create the receive file folder and file*/
 	int fd = 0;
 	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 	if(access("recv",F_OK) == -1)
@@ -85,17 +86,33 @@ int main(void)
 		return 1;
 	}
 
-	if(write(fd,buf+24, MAXBUF) < 0)
+	if(write(fd,buf+24, nread-24) < 0)
 	{
 		perror("error on write file");
 		exit(1);
+	}
+	if(nread == MAXBUF)
+	{
+		for(;;)
+		{
+			if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
+			{
+				write(fd, buf, nread);
+				//printf("The nread is %d", nread);
+				break;
+
+			}
+			else 
+				write(fd, buf, MAXBUF);
+
+		}
 	}
 	close(fd);
 	/* write message back to client */
 	char *buf2;
 	buf2 = (char *)malloc(MAXBUF);
 	strcpy(buf2, "Transfer finished\n");
-	if(write(msgsock, buf2, 1024) < 0) {
+	if(write(msgsock, buf2, MAXBUF) < 0) {
 		perror("error writing on stream socket");
 		exit(1);
 	}

@@ -2,7 +2,7 @@
 CC = gcc
 OBJCLI = ftpc.c 
 OBJSRV = ftps.c
-CFLAGS = -ansi #-lxnet
+CFLAGS = #-ansi #-lxnet
 # setup for system
 LIBS =
 all: ftpc ftps
