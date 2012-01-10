@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#define port "1050"   /* socket file name */
+//#define port "1050"   /* socket file name */
 #define MAXBUF 1000
 int file_send(int sck, char *file);
 /* client program called with host name where server is run */
@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
 				      * setup */
 	struct hostent *hp;
 	char filename[MAXBUF];
-	if(argc < 2) {
+	if(argc < 4) {
 		printf("Usage: ftpc <remote-IP> <remote-port> <loca-file-transfer>\n");
 		exit(1);
 	}
-	strcpy(filename, argv[2]);
+	strcpy(filename, argv[3]);
 	/* initialize socket connection in unix domain */
 	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		perror("error openting datagram socket");
@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
 	/* construct name of socket to send to */
 	bcopy((void *)hp->h_addr, (void *)&sin_addr.sin_addr, hp->h_length);
 	sin_addr.sin_family = AF_INET;
-	sin_addr.sin_port = htons(atoi(port)); /* fixed by adding htons() */
+	//sin_addr.sin_port = htons(atoi(port)); /* fixed by adding htons() */
+	sin_addr.sin_port = htons(atoi(argv[2])); /* fixed by adding htons() */
 
 	/* establish connection with server */
 	if(connect(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {

@@ -11,11 +11,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-#define port "1050"   /* socket file name */
+//#define port "1050"   /* socket file name */
 #define MAXBUF 1000
 
 /* server program called with no argument */
-int main(void)
+int main(int argc, char *argv[])
 {
 	int sock;                     /* initial socket descriptor */
 	int msgsock;                  /* accepted socket descriptor,
@@ -25,6 +25,10 @@ int main(void)
 	struct sockaddr_in sin_addr; /* structure for socket name setup */
 	char* buf;
 	buf = (char*)malloc(MAXBUF);
+	if(argc < 2) {
+		printf("Usage: ftps <local-port>");
+		exit(1);
+	}
 	printf("TCP server waiting for remote connection from clients ...\n");
 
 	/*initialize socket connection in unix domain*/
@@ -36,7 +40,8 @@ int main(void)
 	/* construct name of socket to send to */
 	sin_addr.sin_family = AF_INET;
 	sin_addr.sin_addr.s_addr = INADDR_ANY;
-	sin_addr.sin_port = htons(atoi(port));
+	//sin_addr.sin_port = htons(atoi(port));
+	sin_addr.sin_port = htons(atoi(argv[1]));
 
 	/* bind socket name to socket */
 	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
