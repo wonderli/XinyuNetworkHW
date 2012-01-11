@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	char* buf;
 	buf = (char*)malloc(MAXBUF);
 	if(argc < 2) {
-		printf("Usage: ftps <local-port>");
+		printf("Usage: ftps <local-port>\n");
 		exit(1);
 	}
 	printf("TCP server waiting for remote connection from clients ...\n");
@@ -66,17 +66,19 @@ int main(int argc, char *argv[])
 		perror("error reading on stream socket");
 		exit(1);
 	} 
-	printf("Server receives: %s\n", buf);
+	//printf("Server receives: %s\n", buf);
 	char *filename;
 	char *filepath;
-	int file_size = 0;
+	uint32_t file_size = 0;
+	uint32_t file_size_local = 0;
 	filename = (char*)malloc(20);
 	filepath = (char*)malloc(MAXBUF);
 	bcopy(buf, &file_size, sizeof(int));
+	file_size_local = ntohl(file_size);
 	bcopy(buf+4, filename, 20);
 	strcpy(filepath, "./recv/");
 	strcat(filepath, filename);
-	printf("The file length is %d\n", file_size);
+	printf("The file length is %d\n", file_size_local);
 	printf("The file name is %s\n", filepath);
 	/*Create the receive file folder and file*/
 	int fd = 0;

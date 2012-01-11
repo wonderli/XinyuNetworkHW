@@ -119,8 +119,9 @@ int file_send (int sck, char *filename)
 	  return 1;
   }
   bzero(read_file_buf, MAXBUF);
-  int file_size = get_file_size(filename);
-  printf("filesize is %d\n", file_size);
+  int file_size_local = get_file_size(filename);
+  uint32_t file_size = htonl(file_size_local);
+  printf("filesize is %d\n", file_size_local);
   printf("filename is %s\n", filename);
   bcopy(&file_size, read_file_buf, sizeof(int));
   bcopy(filename, read_file_buf+4, 20);
