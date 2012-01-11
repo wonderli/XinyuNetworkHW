@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-//#define port "1050"   /* socket file name */
+/*#define port "1050"*/   /* socket file name */
 #define MAXBUF 1000
 
 /* server program called with no argument */
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	/* construct name of socket to send to */
 	sin_addr.sin_family = AF_INET;
 	sin_addr.sin_addr.s_addr = INADDR_ANY;
-	//sin_addr.sin_port = htons(atoi(port));
+	/*sin_addr.sin_port = htons(atoi(port));*/
 	sin_addr.sin_port = htons(atoi(argv[1]));
 
 	/* bind socket name to socket */
@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
 		perror("error reading on stream socket");
 		exit(1);
 	} 
-	//printf("Server receives: %s\n", buf);
+	/*printf("Server receives: %s\n", buf);*/
 	char *filename;
 	char *filepath;
 	uint32_t file_size = 0;
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 			if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
 			{
 				write(fd, buf, nread);
-				//printf("The nread is %d", nread);
+				/*printf("The nread is %d", nread);*/
 				break;
 
 			}

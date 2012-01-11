@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-//#define port "1050"   /* socket file name */
+/*#define port "1050" */   /* socket file name */
 #define MAXBUF 1000
 int file_send(int sck, char *file);
 /* client program called with host name where server is run */
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	/* construct name of socket to send to */
 	bcopy((void *)hp->h_addr, (void *)&sin_addr.sin_addr, hp->h_length);
 	sin_addr.sin_family = AF_INET;
-	//sin_addr.sin_port = htons(atoi(port)); /* fixed by adding htons() */
+	/*sin_addr.sin_port = htons(atoi(port));*/ /* fixed by adding htons() */
 	sin_addr.sin_port = htons(atoi(argv[2])); /* fixed by adding htons() */
 
 	/* establish connection with server */
@@ -90,7 +90,7 @@ int get_file_size(char *filename)
 	return file_stat.st_size;
 	*/
 	FILE *fp;
-	int start = 0; //Read start point
+	int start = 0; /*Read start point*/
 	int file_size = 0;
 	fp = fopen(filename, "rb");
 	if(fp == NULL)
@@ -138,7 +138,7 @@ int file_send (int sck, char *filename)
 		  if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
 		  {
 			  send (sck, read_file_buf, nread, 0);
-			  //printf("The nread is %d", nread);
+			  /*printf("The nread is %d", nread);*/
 			  break;
 		  }
 		  else
