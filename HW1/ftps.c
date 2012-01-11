@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	/*printf("\n%s\n", buf2);*/
-	printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size);
+	printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size_local);
 	
 	/* close all connections and remove socket file */
 	close(msgsock);
