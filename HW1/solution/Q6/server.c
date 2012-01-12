@@ -1,4 +1,3 @@
-/* Example: server.c receiving and sending datagrams on system generated port in UDP */
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>

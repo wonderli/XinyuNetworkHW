@@ -1,4 +1,3 @@
-/* Example: client.c sending and receiving datagrams using UDP */
 #include <netdb.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -15,9 +14,6 @@ int send_udp(int sck, char* buf);
 int main(int argc, char *argv[])
 {
     int sock, buflen;
-    //char cli_buf[MAX_MES_LEN] = "Hello in UDP from client";
-    //char *send_buf;
-    //send_buf = (char*)malloc(MAX_MES_LEN);
     char send_buf[MAX_MES_LEN];
     bzero(send_buf, MAX_MES_LEN);
     struct hostent *hp, *gethostbyname();
