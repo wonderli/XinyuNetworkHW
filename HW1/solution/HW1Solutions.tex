@@ -11,11 +11,19 @@
 \caption{Capture packet printout}
 \end{figure} 
 \begin{itemize}
-\item The sequence number of SYN packet is 315.\\
-\item The sequence number of data packet is 365.\\
-\item The sequence number of FIN packet is 495 and 496.\\
-\item 495 is the FIN/ACK packet send from 192.168.10.3 to 192.168.10.2.\\
-\item 496 is the FIN/ACK packet send from 192.168.10.2 to 192.168.10.3\\
+%\item The sequence number of SYN packet is 315.\\
+%\item The sequence number of data packet is 365.\\
+%\item The sequence number of FIN packet is 495 and 496.\\
+%\item 495 is the FIN/ACK packet send from 192.168.10.3 to 192.168.10.2.\\
+%\item 496 is the FIN/ACK packet send from 192.168.10.2 to 192.168.10.3\\
+\item No. 315 is SYN packet from sender, the sequence Number is 0
+\item No. 316 is SYN, ACK packet from receiver, the sequence Number is 0, acknowledgement number is 1
+\item No. 317 is ACK packet from the sender, the sequence Number is 1, acknowledgement number is 1
+\item No. 365 is data packet from the sender.
+\item No. 367 is ACK packet from the receiver, the sequence Number is 1, acknowledgement number is 3
+\item No. 495 is FIN, ACK packet from the sender, the sequence Number is 3, acknowledgement number is 1
+\item No. 496 is FIN, ACK packet from the receiver, the sequence number is 1, acknowledgement number is 4
+\item No. 497 is ACK packet from the sender, the sequence number is 4, acknowledgement number is 2
 \end{itemize}
 \section*{Question 3}
 \begin{verbatim}
