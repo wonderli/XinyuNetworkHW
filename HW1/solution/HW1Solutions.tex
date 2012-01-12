@@ -1,4 +1,37 @@
 \documentclass[a4paper,12pt]{article}
+\usepackage[hmargin=2cm,vmargin=2cm]{geometry}
+\usepackage{graphicx}
 \begin{document}
+\title{CSE678 Homework1}
+\author{Xinyu Li\\li.1659@buckeyemail.osu.edu}
+\maketitle
+\section*{Question 2}
+\begin{figure}[!htbp]
+\includegraphics[width=1\textwidth]{Q2.png}
+\end{figure}
 
+\section*{Question 3}
+\begin{verbatim}
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.10.64   *               255.255.255.192 U     0      0        0 eth0
+192.168.10.0    *               255.255.255.192 U     0      0        0 eth2
+192.168.10.128  router2.localdo 255.255.255.192 UG    0      0        0 eth0
+169.254.0.0     *               255.255.0.0     U     0      0        0 eth2
+\end{verbatim}
+Destination: The Destination network or host.\\
+Gateway: The gateway address, if it is shows * means none.\\
+Genmask: The netmask for the destination network. If the Genmask is 255.255.255.255 means that the destination is a host.\\
+Flags: The Flags for the route. U means route is up. G means the Gateway.\\
+Metric: The distance to the target, it is count by calculating hops.\\
+Ref: Number of references to this route.\\
+Use: Count of lookups for the route.\\
+Iface: Interface to which packets for this route will be sent.\\
+In this result, the first column are destination network, as we can see from the topolgy diagram from the testbed, 192.168.10.0 means the PrasunNet1 network, 192.168.10.64 means the PrasunNet2 network, 192.168.10.128 means the PrasunNet3 network, 169.254.0.0 means the link-local network, from 169.254.0.0 to 169.254.254.255, this network is reserved for link-local addressing in IPv4 by IETF, they are assigned to interfaces by host internal. The second column means the gateway that the packet need to go through to reach the destination network, from the topology diagram we can get that router can directly reach the PrasunNet1 and PrasunNet2, need pass router2 to reach PrasunNet3. The third column is the network mask for the destination network, the PrasunNet1, PrasunNet2 and PrasunNet3 are all the network which have 62 hosts in the network. The fourth column is the Flags, U means the route is up and the G means reach that network need use gateway. Metric is calculate the distance from the route1 to the destination network. The fifth column is the number of references to this route. The sixth column is used for count of lookups for the route. The seventh column is the interface being used which send the packet to the destination network, as we can see from the network topology diagram, the PrasunNet3 and PrasunNet2 are both use eth2 interface, the PrasunNet1 is use eth0 interface.
+\section*{Question4}
+%The main program will create a process, this process we named p1, in p1 it will run till the fork() called, and then there will create another process, we name this process as p2, at this time the i value in both p1 and p2 are 0, after function fork() returned, the i in p1 is 1, i in p2 is 0, in p1 is also create p3, after p3 is created, i in p1 is 2 which doesn't satify the for loop condition, just keep running in the while(1) function. when i in p2 is 0 the for loop is going, created p4, after created p4, i in p2 is become 2 which doesn't satify the for loop condition, then keep going in the while(1) function, at this time i in p4 is 1 and created 1
+\begin{enumerate}
+\item The main program will create a process, called p1, at this time i = 0, then fork a new process called p2, after fork p2, i in both p1 and p2 are 1 now, then p1 fork a new process called p3, p2 fork a new process called p4, by now, all the process enter the while loop, so there totally 4 process created by this program.
+\item $2^n$
+\end{enumerate}
 \end{document}
