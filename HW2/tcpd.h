@@ -14,5 +14,5 @@
 #define TCPD_PORT 1110
 #define MAXBUF 1000
 
-int SEND(int socket, const void * buffer, size_t len, int flags);
+int SEND(int socket, const void *buffer, size_t len, int flags);
 int RECEIVE(int socket, void *buffer, size_t length, int flags);
