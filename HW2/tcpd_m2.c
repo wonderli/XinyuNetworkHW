@@ -38,25 +38,28 @@ int main() /* server program called with no argument */
 	exit(2);
     }
 
-    sock_to_troll_len=sizeof(struct sockaddr_in);
 
     /* Find assigned port value and print it for client to use */
+    /*
     if(getsockname(sock, (struct sockaddr *)&name, &namelen) < 0){
 	perror("getting sock name");
 	exit(3);
     }
     printf("Server waiting on port # %d\n", ntohs(name.sin_port));
-
+    */
+	
     /* waiting for connection from client on name and print what client sends */
-    namelen = sizeof(name);
+    /*namelen = sizeof(name);*/
+    namelen=sizeof(struct sockaddr_in);
+    sock_to_troll_len=sizeof(struct sockaddr_in);
     buflen = MAXBUF;
     while(1) {
 	    if((buflen = recvfrom(sock, srv_buf, MAXBUF, 0, (struct sockaddr *)&name, &namelen)) < 0){
-		    perror("error receiving"); 
+		    perror("error receiving from ftpc"); 
 		    exit(4);
 	    }
 	    if((sendto(sock_to_troll, srv_buf, buflen, 0, (struct sockaddr *)&troll_addr, sock_to_troll_len)) < 0){
-		    perror("sending datagram");
+		    perror("sending datagram to troll");
 		    exit(5);
 	    }
 	    bzero(srv_buf, buflen);
