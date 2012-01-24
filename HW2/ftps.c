@@ -105,7 +105,8 @@ int main(int argc, char *argv[])
 	{
 		for(;;)
 		{
-			if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
+			//if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
+			if((nread = recv(msgsock, buf, MAXBUF, 0)) < MAXBUF)
 			{
 				write(fd, buf, nread);
 				/*printf("The nread is %d", nread);*/

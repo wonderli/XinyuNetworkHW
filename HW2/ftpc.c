@@ -131,22 +131,26 @@ int file_send (int sck, char *filename)
   bcopy(filename, read_file_buf+4, 20);
   if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF - 24))
   {
-	  send (sck, read_file_buf, nread+24, 0);
+	  //send (sck, read_file_buf, nread+24, 0);
+	  SEND (sck, read_file_buf, nread+24, 0);
   }
   else if (nread == (MAXBUF -24))
   {
-	  send (sck, read_file_buf, nread+24, 0);
+	  //send (sck, read_file_buf, nread+24, 0);
+	  SEND (sck, read_file_buf, nread+24, 0);
 
 	  for(;;)
 	  {
 		  if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
 		  {
-			  send (sck, read_file_buf, nread, 0);
+			  //send (sck, read_file_buf, nread, 0);
+			  SEND (sck, read_file_buf, nread, 0);
 			  /*printf("The nread is %d", nread);*/
 			  break;
 		  }
 		  else
-			  send (sck, read_file_buf, MAXBUF, 0);
+			  //send (sck, read_file_buf, MAXBUF, 0);
+			  SEND (sck, read_file_buf, MAXBUF, 0);
 	  } 
   }
   /*
