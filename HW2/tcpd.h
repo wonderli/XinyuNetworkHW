@@ -12,6 +12,7 @@
 #include <string.h>
 #endif
 #define TCPD_PORT 1110
+#define TROLL_PORT 2110
 #define MAXBUF 1000
 
 int SEND(int socket, const void *buffer, size_t len, int flags);

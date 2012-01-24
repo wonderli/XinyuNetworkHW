@@ -5,24 +5,41 @@ int main() /* server program called with no argument */
 {
     int sock, namelen, buflen;
     char srv_buf[MAXBUF];
+    int sock_to_troll, sock_to_troll_len;
     struct sockaddr_in name;
-
-    /*create socket*/
+    struct sockaddr_in troll_addr;
+    /*create from ftpc socket*/
     sock = socket(AF_INET, SOCK_DGRAM, 0);
     if(sock < 0) {
-	perror("opening datagram socket");
+	perror("opening datagram socket for recv from ftpc");
 	exit(1);
+    }
+    /*create troll socket*/
+    sock_to_troll = socket(AF_INET, SOCK_DGRAM, 0);
+    if(sock_to_troll < 0) {
+	    perror("opening datagram socket for send to troll");
+	    exit(1);
     }
 
     /* create name with parameters and bind name to socket */
     name.sin_family = AF_INET;
     name.sin_port = htons(TCPD_PORT);
-    name.sin_addr.s_addr = INADDR_ANY;
+    name.sin_addr.s_addr = htonl(INADDR_ANY);
     if(bind(sock, (struct sockaddr *)&name, sizeof(name)) < 0) {
-	perror("getting socket name");
+	perror("Recv socket Bind failed");
 	exit(2);
     }
-    namelen=sizeof(struct sockaddr_in);
+    /* create troll_addr with parameters and bind troll_addr to socket */
+    troll_addr.sin_family = AF_INET;
+    troll_addr.sin_port = htons(TROLL_PORT);
+    troll_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    if(bind(sock_to_troll, (struct sockaddr *)&troll_addr, sizeof(troll_addr)) < 0) {
+	perror("Send socket Bind failed");
+	exit(2);
+    }
+
+    sock_to_troll_len=sizeof(struct sockaddr_in);
+
     /* Find assigned port value and print it for client to use */
     if(getsockname(sock, (struct sockaddr *)&name, &namelen) < 0){
 	perror("getting sock name");
@@ -34,11 +51,11 @@ int main() /* server program called with no argument */
     namelen = sizeof(name);
     buflen = MAXBUF;
     while(1) {
-	    if((buflen = recvfrom(sock, srv_buf, MAXBUF, 1, (struct sockaddr *)&name, &namelen)) < 0){
+	    if((buflen = recvfrom(sock, srv_buf, MAXBUF, 0, (struct sockaddr *)&name, &namelen)) < 0){
 		    perror("error receiving"); 
 		    exit(4);
 	    }
-	    if((sendto(sock, srv_buf, buflen, (struct sockaddr *)&name, namelen)) < 0){
+	    if((sendto(sock_to_troll, srv_buf, buflen, 0, (struct sockaddr *)&troll_addr, sock_to_troll_len)) < 0){
 		    perror("sending datagram");
 		    exit(5);
 	    }

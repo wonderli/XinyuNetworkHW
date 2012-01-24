@@ -38,7 +38,7 @@ int main() /* server program called with no argument */
 		    perror("error receiving"); 
 		    exit(4);
 	    }
-	    if((sendto(sock, srv_buf, buflen, (struct sockaddr *)&name, namelen)) < 0){
+	    if((sendto(sock, srv_buf, buflen, 0, (struct sockaddr *)&name, namelen)) < 0){
 		    perror("sending datagram");
 		    exit(5);
 	    }
