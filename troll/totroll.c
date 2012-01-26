@@ -20,6 +20,7 @@ static char *rcsid = "$Header: /var/home/solomon/640/troll/RCS/totroll.c,v 3.2 1
 #include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <errno.h>
 #include <ctype.h>
 #include <netdb.h>
 #include <stdio.h>

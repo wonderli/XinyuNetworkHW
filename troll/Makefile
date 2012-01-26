@@ -7,10 +7,10 @@ CFLAGS =
 RCSDIFFFLAGS = -c
 CC = gcc 
 #LIB = -lm -lsocket -lc -lnsl -L/usr/ucblib -R/usr/ucblib -lucb
-LIB = -lm #-lsocket #-lnsl 
-# LIB = -lm -lc
+#LIB = -lm -lsocket -lnsl 
+LIB = -lm -lc
 
-ALL = troll fromtroll totroll
+ALL = fromtroll totroll
 SRC = Makefile fromtroll.c totroll.c troll_bugfixed.c troll.1 troll.h
 
 all: $(ALL)
@@ -18,8 +18,8 @@ all: $(ALL)
 clean: true
 	rm -f *.o $(ALL)
 
-troll: troll.o
-	$(CC) $(CFLAGS) -o troll troll.o $(LIB)
+# troll: troll.o
+# 	$(CC) $(CFLAGS) -o troll troll.o $(LIB)
 
 fromtroll: fromtroll.o
 	$(CC) $(CFLAGS) -o fromtroll fromtroll.o $(LIB)
