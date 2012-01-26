@@ -1,0 +1,462 @@
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+           NNAAMMEE
+                  troll - network simulator / datagram forwarder
+
+           SSYYNNOOPPSSIISS
+                  ttrroollll [_o_p_t_i_o_n_s] ppoorrtt
+                  ##iinncclluuddee <<ssyyss//ttyyppeess..hh>>
+                  ##iinncclluuddee <<nneettiinneett//iinn..hh>>
+                  ##iinncclluuddee ""ttrroollll..hh""
+
+           DDEESSCCRRIIPPTTIIOONN
+                  TTrroollll  is  an application designed to simulate the various
+                  quirks and vagaries of a network environment.   The  troll
+                  forwards  UDP  datagrams between processes, possibly drop-
+                  ping, delaying, garbling, and/or duplicating  those  data-
+                  grams.
+
+           CCOOMMMMAANNDD LLIINNEE AARRGGUUMMEENNTTSS
+                  ppoorrtt       The  UDP  port  number  on which the troll will
+                             listen for incoming datagrams.   This  argument
+                             is  mandatory,  and  must be an integer between
+                             1024 and 65535.
+
+                  The following options override various default parameters.
+                  They can also be set by interactive commands, as described
+                  below.  Options specified as _p_e_r_c_e_n_t must be an integer in
+                  the range from 0 through 100.
+
+                  --bb         Normally,  the  troll  runs  in  an interactive
+                             mode, as described in  the  following  section.
+                             The  --bb  option  disables the interactive mode,
+                             and the troll can thus be run more conveniently
+                             in  the  background.   For  example,  "troll -b
+                             26784 -s0 -x0 &" will start the  troll  in  the
+                             background,  listening  on  UDP  port 26784 and
+                             neither delaying nor dropping datagrams.
+
+                  --ff_f_i_l_e     The distribution of datagram delays  is  to  be
+                             taken  from the named file rather than computed
+                             from the _d_e_l_a_y parameter.  See the  description
+                             of the ddeellaayy ffiillee interactive command below.
+
+                  --gg_p_e_r_c_e_n_t  The percentage of datagrams that should be gar-
+                             bled (default is 0%).
+
+                  --mm_p_e_r_c_e_n_t  The percentage  of  datagrams  that  should  be
+                             duplicated  (sent  multiple  times;  default is
+                             0%).
+
+                  --rr         Allow reordering.  Without this option,  delays
+                             are  all interpreted as relative: Datagrams are
+                             queued first-in-first out, with delays  between
+                             datagrams  calculated  according  to  the delay
+                             parameter (see _-_s, _-_s_e, and _-_f).  With  the  _-_r
+                             option,   delays   are  absolute.   Since  each
+
+
+
+                                       ECE/CS 338                          1
+
+
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+                             datagram is  independently  delayed,  datagrams
+                             may  be sent out in a different order than they
+                             arrived.  See further discussion under  TTEECCHHNNII--
+                             CCAALL DDEETTAAIILLSS below.
+
+                  --ss_n_u_m_b_e_r
+
+                  --ssee_n_u_m_b_e_r  The  separation  of  datagrams  in milliseconds
+                             (default is 100; see also _-_f).  If ee is  speci-
+                             fied,  the delay is an exponential random vari-
+                             able with mean _n_u_m_b_e_r _.   Otherwise,  it  is  a
+                             constant.
+
+                  --xx_p_e_r_c_e_n_t  The  percentage  of  datagrams  that  should be
+                             dropped (default is 10%).
+
+           IINNTTEERRAACCTTIIVVEE MMOODDEE
+                  After being started, the troll normally runs in an  inter-
+                  active mode, and will prompt for commands with the message
+                         Speak to the troll:
+                  A command may be abbreviated to any unambiguous prefix.
+
+                  ddrroopp _p_e_r_c_e_n_t     Sets the  percentage  of  datagrams  that
+                                   will  be  dropped (i.e., will not be for-
+                                   warded).
+                                   Note that the troll  can  buffer  only  a
+                                   limited  number  of datagrams; if a data-
+                                   gram  arrives  and  no  buffer  space  is
+                                   available, the datagram is dropped.  Set-
+                                   ting ddeellaayy or dduupplliiccaattee to a sufficiently
+                                   high  value  may  result  datagrams being
+                                   dropped even if  the  ddrroopp  parameter  is
+                                   zero.
+
+                  ddeellaayy _m_i_l_l_i_s_e_c_o_n_d_s
+
+                  ddeellaayy eexxppoonneennttiiaall _m_e_a_n
+
+                  ddeellaayy ffiillee _f_i_l_e_n_a_m_e
+                                   These  commands control the ddeellaayy distri-
+                                   bution.  Depending on the setting of  the
+                                   rreeoorrddeerr  option, the ddeellaayy parameter con-
+                                   trols the delay of datagrams  or  separa-
+                                   tion  between  them.  The first form sets
+                                   ddeellaayy to a specific  value.   The  second
+                                   sets  it  to an exponentially distributed
+                                   random variable with the indicated  mean.
+                                   (Other  distributions  may be provided by
+                                   future releases of the troll).  The third
+                                   form  sets it to a random variable with a
+                                   distribution indicated by  the  histogram
+                                   contained  in  the named file.  The third
+                                   form takes the distribution from a  file.
+                                   The first line of the file should contain
+
+
+
+                                       ECE/CS 338                          2
+
+
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+                                   an integer indicating the  precision,  in
+                                   milliseconds.   The remainder of the file
+                                   should have have one line for each possi-
+                                   ble delay value (in multiples of the pre-
+                                   cision).  The length of  each  line  (not
+                                   including  the  newline  character at its
+                                   end) controls the relative  frequency  of
+                                   corresponding  delays.   (The actual con-
+                                   tents of the  lines  are  ignored).   For
+                                   example, if file contains
+                                       100
+                                       <two empty lines>
+                                       xx
+                                       xxxxxx
+                                       xxx
+                                       x
+                                       x
+                                   then   2/13  of  the  datagrams  will  be
+                                   delayed  200ms,  6/13  will  be   delayed
+                                   300ms,   3/13  400ms,  1/13  500ms,  1/13
+                                   600ms, and no datagrams will  be  delayed
+                                   less  than 200 or more than 600 millisec-
+                                   onds.  As a special  case,  a  file  with
+                                   only  one  non-empty line after the first
+                                   will generate a  deterministic  distribu-
+                                   tion  (all  datagrams  delayed  the  same
+                                   amount of time).
+                                   _W_a_r_n_i_n_g_: Although delays are specified in
+                                   milliseconds,  the Unix timing facilities
+                                   are usually less precise, so  delays  may
+                                   actually be longer than specified.
+
+                  ggaarrbbllee _p_e_r_c_e_n_t   Sets  the  percent of forwarded datagrams
+                                   that will be garbled (i.e., have  one  or
+                                   more bits changed).
+
+                  dduupplliiccaattee _p_e_r_c_e_n_t
+                                   Sets  the  percent of forwarded datagrams
+                                   that will be duplicated (i.e.,  transmit-
+                                   ted  more  than  once); of those, _p_e_r_c_e_n_t
+                                   will  be  duplicated  again,  etc.   Each
+                                   duplicate  of  a  particular  datagram is
+                                   independently delayed and garbled.
+
+                  ssoouurrccee _f_i_l_e_n_a_m_e  Reads "interactive" commands from.  _f_i_l_e_-
+                                   _n_a_m_e_.
+
+                  The remaining commands do not take any argument.
+
+                  rreeoorrddeerr          Toggles the rreeoorrddeerr option (initially _o_f_f
+                                   unless  set  by   the   --rr   command-line
+                                   option).   If  rreeoorrddeerr  is off, the ddeellaayy
+                                   distribution is used to compute the delay
+                                   _b_e_t_w_e_e_n  datagrams  sent out.  If rreeoorrddeerr
+
+
+
+                                       ECE/CS 338                          3
+
+
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+                                   is on, the ddeellaayy distribution is used  to
+                                   compute the _t_o_t_a_l delay for each datagram
+                                   (or duplicate).  If the rreeoorrddeerr option is
+                                   on and ddeellaayy is not a constant, datagrams
+                                   may not be forwarded in  the  same  order
+                                   they were received.
+
+                  ppaarraammeetteerrss       Prints  the  current values of the relia-
+                                   bility parameters.
+
+                  ssttaattiissttiiccss       Prints statistics  about  the  number  of
+                                   datagrams  dropped,  garbled, duplicated,
+                                   etc.  These statistics are  also  printed
+                                   on termination.
+
+                  cclleeaarrssttaattss       Clears   all   statistics  to  zero  (the
+                                   startup value).
+
+                  bbaacckkggrroouunndd       (Alias zzaapp).  Tells  the  troll  to  stop
+                                   accepting   interactive  commands.   This
+                                   command is useful for putting  the  troll
+                                   into  the  background.  You can then type
+                                   `^Z' and `bg' to actually put  the  troll
+                                   in the background.  (See also --bb).
+
+                  qquuiitt             Causes  the troll to print statistics and
+                                   terminate.  The same effect  is  produced
+                                   by  an interactive "command" of control-D
+                                   or  by  a  keyboard  interrupt  (or  kill
+                                   -INT).
+
+                  ttrraaccee            Toggles  the  ttrraaccee option.  When tracing
+                                   is enabled, the ttrroollll  prints  a  message
+                                   starting   with   `<'  on  each  datagram
+                                   arrival, and a message starting with  `>'
+                                   on each datagram transmission.
+
+           PPRROOGGRRAAMMMMIINNGG IINNTTEERRFFAACCEE
+                  The data contained in every UDP datagram sent to the troll
+                  must begin with a _s_o_c_k_a_d_d_r___i_n  structure,  as  defined  in
+                  <netinet/in.h>:
+                      struct sockaddr_in {
+                           short     sin_family;
+                           u_short   sin_port;
+                           struct    in_addr sin_addr;
+                           char sin_zero[8];
+                      };
+                  The ttrroollll forwards the datagram to the socket addressed by
+                  this field.  Before forwarding the datagram, it overwrites
+                  this  field  with  the address of the socket from which it
+                  came.
+
+                  _N_o_t_e_: All fields must be in network byte order.  This this
+                  convention  differs  from  system calls (such as _s_e_n_d_t_o_(_2_)
+
+
+
+                                       ECE/CS 338                          4
+
+
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+                  and _r_e_c_v_f_r_o_m_(_2_)) which expect the sin_family field  to  be
+                  in host byte order.
+
+                  For example, if a program sends datagrams using code simi-
+                  lar to
+                      struct sockaddr_in dest;
+                      char buffer[BUFFER_SIZE];
+
+                      dest.sin_family = AF_INET;
+                      dest.sin_addr = /* Internet address of remote machine */;
+                      dest.sin_port = htons(PORT);
+                           .
+                           .
+                           .
+                      /* fill buffer with data */
+
+                      result = sendto(socket, buffer, sizeof buffer, 0,
+                               (struct sockaddr *)dest, sizeof dest);
+                  it can be transformed to use the ttrroollll as follows
+                      struct sockaddr_in dest, troll;
+                      struct {
+                           struct sockaddr_in header;
+                           char body[BUFFER_SIZE];
+                      } message;
+
+                      message.header.sin_family = htons(AF_INET);
+                      message.header.sin_addr = /* Internet address of remote machine */;
+                      message.header.sin_port = htons(PORT);
+
+                      troll.sin_family = AF_INET;
+                      troll.sin_addr = /* Internet address of machine running the troll */;
+                      troll.sin_port = htons(TROLL_PORT);
+                           .
+                           .
+                           .
+                      /* fill buffer with data */
+
+                      result = sendto(socket, (char *)&message, sizeof message, 0,
+                               (struct sockaddr *)troll, sizeof troll);
+                  When the datagram arrives, the header is  in  the  correct
+                  format  for  a reply.  Thus a simple "echo server" has the
+                  outline
+                      for(;;) {
+                           struct sockaddr_in trolladdr;
+                           int len = sizeof trolladdr;
+                           NetMessage message;
+
+                           /* read in one message from the troll */
+                           n = recvfrom(sock, (char *)&message, sizeof message, 0,
+                                     (struct sockaddr *)&trolladdr, &len);
+                           if (n<0) {
+                                perror("fromtroll recvfrom");
+                                exit(1);
+                           }
+
+
+
+                                       ECE/CS 338                          5
+
+
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+                           printf("troll [%s,%d]",
+                                inet_ntoa(trolladdr.sin_addr), ntohs(trolladdr.sin_port));
+                           printf("source [%s,%d]0,
+                                inet_ntoa(message.msg_header.sin_addr),
+                                ntohs(message.msg_header.sin_port));
+                           n = sendto(sock, (char *)&message, sizeof message, 0,
+                                               (struct sockaddr *)&trolladdr, len);
+                           if (n!=sizeof message) {
+                                perror("fromtroll sendto");
+                                exit(1);
+                           }
+                      }
+                  Troll.c,  as  well  as   test   programs   totroll.c   and
+                  fromtroll.c are available in the course home page.
+
+           TTEECCHHNNIICCAALL DDEETTAAIILLSS
+                  Whenever a datagram arrives, the troll examines the header
+                  to see whether the sockaddr  there  meets  minimal  sanity
+                  checks   (it  requires  that  ntohs(header.sin_family)  is
+                  AF_INET and that htohs(header.sin_port) is  in  the  range
+                  1024..65535;  it does not check whether header.sin_addr is
+                  reasonable).  If not, it increments a  counter  and  drops
+                  the  datagram.   Otherwise,  it  records  the  destination
+                  address from the header and overwrites it with the  socket
+                  address of the sender.
+
+                  Next, the troll flips a coin, and with probability ddrroopp it
+                  throws away the datagram (incrementing a counter).  Other-
+                  wise,  it  flips  another coin and with probability ggaarrbbllee
+                  garbles the datagram.  The garbling algorithm chooses 5 to
+                  10 bytes of the datagram and xor's them with a random pat-
+                  tern.  The bytes are chosen randomly, except that one gar-
+                  bled  byte is guaranteed to be among the first 10 bytes of
+                  the datagram.  The return address is not garbled.
+
+                  Next, the troll calculates when to transmit  the  datagram
+                  and schedules a timer event to send it.  A random value is
+                  computed according to the current ddeellaayy settings.  If  the
+                  rreeoorrddeerr  parameter  is _o_n, the dispatch time is calculated
+                  by adding the random value to the  to  the  current  time.
+                  Otherwise,  it is calculated to adding the random value to
+                  the latest dispatch time any datagram currently queued for
+                  delivery.    The  timer  queue  is  maintained  such  that
+                  requests to send two or more datagrams at  the  same  time
+                  are satisfied first-come-first-served.
+
+                  After the troll queues a datagram for delivery, it flips a
+                  coin and with probability dduupplliiccaattee makes a  copy  of  the
+                  datagram.   The  copy is treated as an independent arrival
+                  and duplicated, delayed, garbled, etc. as described above.
+
+           SSUURRGGEEOONN GGEENNEERRAALL''SS WWAARRNNIINNGG
+                  Since  UDP does no flow control, datagrams will be dropped
+                  if you send them to the troll too fast, or  if  you  don't
+
+
+
+                                       ECE/CS 338                          6
+
+
+
+
+
+           TROLL(1)                                                 TROLL(1)
+
+
+                  receive  them  fast enough from the troll.  Thus datagrams
+                  may be dropped even if the troll parameters  are  set  for
+                  `perfect reliability' (all probabilities 0).
+
+           BBUUGGSS
+                  There should be more convenient ways to specify other dis-
+                  tributions of delay (such as normal or  hyper-exponential)
+                  and  to  specify distributions for other random variables.
+                  There should be some way to make the delay depend in  com-
+                  plicated ways on the number of datagrams currently queued,
+                  to simulate congestion in the network.
+
+           AAUUTTHHOORRSS
+                  The troll was originally written by Mitchell  Tasman.   It
+                  has  been  extensively  modified  and  enhanced  by Marvin
+                  Solomon.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                       ECE/CS 338                          7
+
+
