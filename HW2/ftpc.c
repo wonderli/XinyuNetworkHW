@@ -28,7 +28,6 @@ int main(int argc, char *argv[])
 	struct sockaddr_in sin_addr; /* structure for socket name 
 				      * setup */
 	struct hostent *hp;
-
 	char filename[MAXBUF];
 	if(argc < 4) {
 		printf("Usage: ftpc <remote-IP> <remote-port> <loca-file-transfer>\n");
