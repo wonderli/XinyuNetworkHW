@@ -53,7 +53,7 @@ int main() /* server program called with no argument */
         struct sockaddr_in ftps_addr;
         int ftps_addr_size = sizeof(struct sockaddr_in);
         bcopy(ftpc_buf1, &ftps_addr, ftps_addr_size);
-        bcopy(ftpc_buf1+ftps_addr_size, &ftpc_buf1, MAXBUF);
+        bcopy(ftpc_buf1+ftps_addr_size, &ftpc_buf, MAXBUF);
         char *ftpc_recv_filename;
         ftpc_recv_filename = (char*) malloc(20);
         strcpy(ftpc_recv_filename, "./recv/received");

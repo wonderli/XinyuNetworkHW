@@ -35,7 +35,8 @@ int main(int argc, char *argv[])
 	printf("TCP server waiting for remote connection from clients ...\n");
 
 	/*initialize socket connection in unix domain*/
-	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+	/*if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){ */
+	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
 		perror("error openting datagram socket");
 		exit(1);
 	}
@@ -45,6 +46,12 @@ int main(int argc, char *argv[])
 	sin_addr.sin_addr.s_addr = INADDR_ANY;
 	/*sin_addr.sin_port = htons(atoi(port));*/
 	sin_addr.sin_port = htons(atoi(argv[1]));
+	int opt=1;
+
+        if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(int)) == -1) {
+                perror("Setsockopt Failed");
+                exit(1);
+        }
 
 	/* bind socket name to socket */
 	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
@@ -53,19 +60,22 @@ int main(int argc, char *argv[])
 	}
 
 	/* listen for socket connection and set max opened socket connetions to 5 */
-	listen(sock, 5);
+	/*listen(sock, 5);
+        */
 
 	/* accept a (1) connection in socket msgsocket */ 
+        /*
 	if((msgsock = accept(sock, (struct sockaddr *)NULL, (int *)NULL)) == -1) { 
 		perror("error connecting stream socket");
 		exit(1);
 	} 
-
+        */
 	/* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);
 	/* read from msgsock and place in buf */
 	int nread = 0; /* the number read from socket*/
-	if((nread = read(msgsock, buf, MAXBUF)) < 0) {
+	/*if((nread = read(msgsock, buf, MAXBUF)) < 0) { */ 
+	if((nread = RECV(sock, buf, MAXBUF,0)) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	} 
@@ -109,7 +119,8 @@ int main(int argc, char *argv[])
 		for(;;)
 		{
 			//if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
-			if((nread = recv(msgsock, buf, MAXBUF, 0)) < MAXBUF)
+			//if((nread = recv(msgsock, buf, MAXBUF, 0)) < MAXBUF)
+			if((nread = RECV(msgsock, buf, MAXBUF, 0)) < MAXBUF)
 			{
 				write(fd, buf, nread);
 				/*printf("The nread is %d", nread);*/
@@ -126,7 +137,7 @@ int main(int argc, char *argv[])
 	char *buf2;
 	buf2 = (char *)malloc(MAXBUF);
 	strcpy(buf2, "Transfer finished\n");
-	if(write(msgsock, buf2, MAXBUF) < 0) {
+	if(write(sock, buf2, MAXBUF) < 0) {
 		perror("error writing on stream socket");
 		exit(1);
 	}

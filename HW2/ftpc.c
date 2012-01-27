@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 	int  rval;                    /* returned value from a read */
 	struct sockaddr_in sin_addr; /* structure for socket name 
 				      * setup */
+        struct sockaddr_in tcpd_addr;
 	struct hostent *hp;
 	char filename[MAXBUF];
 	if(argc < 4) {
@@ -35,7 +36,8 @@ int main(int argc, char *argv[])
 	}
 	strcpy(filename, argv[3]);
 	/* initialize socket connection in unix domain */
-	if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){
+	/*if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){*/
+	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
 		perror("error openting datagram socket");
 		exit(1);
 	}
@@ -49,15 +51,34 @@ int main(int argc, char *argv[])
 	/* construct name of socket to send to */
 	bcopy((void *)hp->h_addr, (void *)&sin_addr.sin_addr, hp->h_length);
 	sin_addr.sin_family = AF_INET;
-	/*sin_addr.sin_port = htons(atoi(port));*/ /* fixed by adding htons() */
 	sin_addr.sin_port = htons(atoi(argv[2])); /* fixed by adding htons() */
 
+        /*tcpd address setup*/
+        tcpd_addr.sin_family = AF_INET;
+        tcpd_addr.sin_port = htons(TCPD_PORT);
+        tcpd_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        /*
+        int opt=1;
+
+        if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(int)) == -1) {
+                perror("Setsockopt Failed");
+                exit(1);
+        }
+        if(bind(sock, (struct sockaddr *)&tcpd_addr, sizeof(struct sockaddr_in)) < 0) {
+                perror("Socket Bind failed");
+                exit(2);
+        }
+
+        */
+
 	/* establish connection with server */
+        /*
 	if(connect(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
 		close(sock);
 		perror("error connecting stream socket");
 		exit(1);
 	}
+        */
 	/* 
 	int file_size = get_file_size(filename);
 	printf("filesize is %d\n", file_size);
@@ -73,6 +94,7 @@ int main(int argc, char *argv[])
 	}
 	printf("Client sends:    %s\n", buf);
 	*/
+        /*
 	char *buf;
 	buf = (char*)malloc(MAXBUF);
 	if(read(sock, buf, MAXBUF) < 0) {
@@ -84,8 +106,8 @@ int main(int argc, char *argv[])
 		printf ("close socket error\n");
 		return 1;
 	}
-
-	printf("Client receives: %s\n", buf);
+        */
+	//printf("Client receives: %s\n", buf);
 	return 0;
 
 }
