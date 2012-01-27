@@ -1,5 +1,5 @@
-#ifndef _NET_HEADER_
-#define _NET_HEADER_
+#ifndef _NET_H
+#define _NET_H
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include <string.h>
 #endif
-#define TCPD_PORT 1110
-#define TROLL_PORT 2110
+#define TCPD_PORT 3110
+#define TROLL_PORT 4110
 #define MAXBUF 1000
 
 int SEND(int socket, const void *buffer, size_t len, int flags);

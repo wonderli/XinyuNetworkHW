@@ -1,6 +1,7 @@
 /*client part of TCPD*/
-/*connection port is 1110*/
+/*connection port is 3110*/
 #include "tcpd.h"
+#include "troll.h"
 int main() /* server program called with no argument */
 {
     int sock, namelen, buflen;

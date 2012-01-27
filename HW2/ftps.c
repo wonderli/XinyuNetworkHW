@@ -76,9 +76,12 @@ int main(int argc, char *argv[])
 	uint32_t file_size_local = 0;
 	filename = (char*)malloc(20);
 	filepath = (char*)malloc(MAXBUF);
-	bcopy(buf, &file_size, sizeof(int));
+        struct sockaddr_in server_addr_recv;
+        int server_addr_recv_size = sizeof(struct sockaddr_in);
+        bcopy(buf, &server_addr_recv, server_addr_recv_size);
+	bcopy(buf+server_addr_recv_size, &file_size, sizeof(int));
 	file_size_local = ntohl(file_size);
-	bcopy(buf+4, filename, 20);
+	bcopy(buf+server_addr_recv_size+4, filename, 20);
 	strcpy(filepath, "./recv/");
 	strcat(filepath, filename);
 	printf("The file length is %d\n", file_size_local);
@@ -96,7 +99,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if(write(fd,buf+24, nread-24) < 0)
+	if(write(fd,buf+server_addr_recv_size+24, nread-24-server_addr_recv_size) < 0)
 	{
 		perror("error on write file");
 		exit(1);

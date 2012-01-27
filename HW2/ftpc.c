@@ -16,7 +16,10 @@
 #define MAXBUF 1000
 #endif
 #include "tcpd.h"
-int file_send(int sck, char *file);
+/*
+* int file_send(int sck, char *file);
+*/
+int file_send (int sck, char *filename, struct sockaddr_in sin_addr);
 /* client program called with host name where server is run */
 int main(int argc, char *argv[])
 {
@@ -60,7 +63,7 @@ int main(int argc, char *argv[])
 	printf("filesize is %d\n", file_size);
 	printf("filename is %s\n", filename);
 	*/
-	file_send(sock,filename);  
+	file_send(sock,filename,sin_addr);  
 
 	/* write buf to sock */
 	/*
@@ -111,7 +114,10 @@ int get_file_size(char *filename)
 	fclose(fp);
 	return file_size;
 }
-int file_send (int sck, char *filename)
+/*
+* int file_send (int sck, char *filename)
+*/
+int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
 {
   int nread;
   int send_file;
@@ -125,32 +131,34 @@ int file_send (int sck, char *filename)
   bzero(read_file_buf, MAXBUF);
   int file_size_local = get_file_size(filename);
   uint32_t file_size = htonl(file_size_local);
+  int sockaddr_in_size = sizeof(struct sockaddr_in);
   printf("filesize is %d\n", file_size_local);
   printf("filename is %s\n", filename);
-  bcopy(&file_size, read_file_buf, sizeof(int));
-  bcopy(filename, read_file_buf+4, 20);
-  if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF - 24))
+  bcopy(&sin_addr, read_file_buf, sockaddr_in_size);
+  bcopy(&file_size, read_file_buf+sockaddr_in_size, sizeof(int));
+  bcopy(filename, read_file_buf+sockaddr_in_size+4, 20);
+  if ((nread = read (send_file, read_file_buf+sockaddr_in_size+24, MAXBUF-sockaddr_in_size-24)) < (MAXBUF-sockaddr_in_size-24))
   {
-	  //send (sck, read_file_buf, nread+24, 0);
-	  SEND (sck, read_file_buf, nread+24, 0);
+	  send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+	  //SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
   }
-  else if (nread == (MAXBUF -24))
+  else if (nread == (MAXBUF-24-sockaddr_in_size))
   {
-	  //send (sck, read_file_buf, nread+24, 0);
-	  SEND (sck, read_file_buf, nread+24, 0);
+	  send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+	  //SEND (sck, read_file_buf, nread+24, 0);
 
 	  for(;;)
 	  {
 		  if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
 		  {
-			  //send (sck, read_file_buf, nread, 0);
-			  SEND (sck, read_file_buf, nread, 0);
+			  send (sck, read_file_buf, nread, 0);
+			  //SEND (sck, read_file_buf, nread, 0);
 			  /*printf("The nread is %d", nread);*/
 			  break;
 		  }
 		  else
-			  //send (sck, read_file_buf, MAXBUF, 0);
-			  SEND (sck, read_file_buf, MAXBUF, 0);
+			  send (sck, read_file_buf, MAXBUF, 0);
+			  //SEND (sck, read_file_buf, MAXBUF, 0);
 	  } 
   }
   /*
