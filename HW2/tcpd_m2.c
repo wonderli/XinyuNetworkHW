@@ -25,8 +25,10 @@ int main() /* server program called with no argument */
 
         /* create ftpc_addr with parameters and bind ftpc_addr to socket */
         ftpc_addr.sin_family = AF_INET;
+        //ftpc_addr.sin_port = htons(TCPD_PORT);
+        //ftpc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
         ftpc_addr.sin_port = htons(TCPD_PORT);
-        ftpc_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+        ftpc_addr.sin_addr.s_addr = INADDR_ANY;
         if(bind(sock_ftpc, (struct sockaddr *)&ftpc_addr, sizeof(ftpc_addr)) < 0) {
                 perror("Recv(receive from ftpc) socket Bind failed");
                 exit(2);
@@ -35,14 +37,8 @@ int main() /* server program called with no argument */
         
         troll_addr.sin_family = AF_INET;
         troll_addr.sin_port = htons(TROLL_PORT);
-        troll_addr.sin_addr.s_addr = htonl(inet_addr("127.0.0.1"));
-        //troll_addr.msg_header.sin_addr.s_addr = htonl(INADDR_ANY);
-        /*
-        if(bind(sock_troll, (struct sockaddr *)&troll_addr, sizeof(troll_addr)) < 0) {
-                perror("Send(send to troll) socket Bind failed");
-                exit(2);
-        }
-        */
+        //troll_addr.sin_addr.s_addr = htonl(inet_addr("127.0.0.1"));
+        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
         ftpc_addr_len=sizeof(struct sockaddr_in);
         sock_to_troll_len=sizeof(struct sockaddr_in);
@@ -98,6 +94,7 @@ int main() /* server program called with no argument */
                                         perror("sending datagram to troll");
                                         exit(5);
                                 }
+                                printf("line number 101, Sent to troll\n");
 
                                 /*        if((nread = recv(msgsock, buf, MAXBUF, 0)) < MAXBUF) */
                                 /*write(fd, ftpc_buf, buflen);*/
@@ -115,6 +112,7 @@ int main() /* server program called with no argument */
                                         perror("sending datagram to troll");
                                         exit(5);
                                 }
+                                printf("line number 119, Sent to troll\n");
                         }
 
 
@@ -122,30 +120,6 @@ int main() /* server program called with no argument */
         }
 
 
-
-
-
-        
-
-
-
-
-
-
-        /*
-        while(1) {
-                if((buflen = recvfrom(sock_ftpc, ftpc_buf, MAXBUF, 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < 0){
-                        perror("error receiving from ftpc"); 
-                        exit(4);
-                }
-                if((sendto(sock_troll, ftpc_buf, buflen, 0, (struct sockaddr *)&troll_addr, sock_to_troll_len)) < 0){
-                        perror("sending datagram to troll");
-                        exit(5);
-                }
-                bzero(ftpc_buf, buflen);
-                printf("Server receives: %s\n", ftpc_buf);
-        }
-        */
         close(sock_ftpc);
         close(sock_troll);
         exit(0);
