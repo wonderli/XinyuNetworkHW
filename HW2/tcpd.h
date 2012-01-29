@@ -11,9 +11,14 @@
 #include <unistd.h>
 #include <string.h>
 #endif
-#define TCPD_PORT 3110
-#define TROLL_PORT 4110
+#define TCPD_PORT 3000
+#define TROLL_PORT_M1 4000
+#define TROLL_PORT_M2 5000
 #define MAXBUF 1000
+typedef struct TCPD_MSG {
+        struct sockaddr_in tcpd_header;
+        char tcpd_contents[MAXBUF];
+} TCPD_MSG;
 
 int SEND(int socket, const void *buffer, size_t len, int flags);
 int RECEIVE(int socket, void *buffer, size_t length, int flags);

@@ -10,6 +10,7 @@ int main() /* server program called with no argument */
         struct sockaddr_in ftps_addr;
         struct sockaddr_in troll_addr;
         NetMessage troll_msg;
+        TCPD_MSG tcpd_msg;
         /*create from ftpc socket*/
         sock_ftps = socket(AF_INET, SOCK_DGRAM, 0);
         if(sock_ftps < 0) {
@@ -26,11 +27,11 @@ int main() /* server program called with no argument */
         /* create ftpc_addr with parameters and bind ftpc_addr to socket */
         ftps_addr.sin_family = AF_INET;
         ftps_addr.sin_port = htons(TCPD_PORT);
-        ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.2");
        /* create troll_addr with parameters and bind troll_addr to socket */
         
         troll_addr.sin_family = AF_INET;
-        troll_addr.sin_port = htons(TROLL_PORT);
+        troll_addr.sin_port = htons(TROLL_PORT_M1);
         troll_addr.sin_addr.s_addr = INADDR_ANY;
         if(bind(sock_troll, (struct sockaddr *)&troll_addr, sizeof(troll_addr)) < 0) {
                 perror("Recv(receive from troll) socket Bind failed");

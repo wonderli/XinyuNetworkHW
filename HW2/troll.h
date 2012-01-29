@@ -3,7 +3,7 @@
 #define TROLL_H
 
 //#define MAXNETMESSAGE 1500
-#define MAXNETMESSAGE 1016
+#define MAXNETMESSAGE 1032
 
 typedef struct NetMessage {
 	struct sockaddr_in msg_header;

@@ -57,68 +57,15 @@ int main(int argc, char *argv[])
         tcpd_addr.sin_family = AF_INET;
         tcpd_addr.sin_port = htons(TCPD_PORT);
         tcpd_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        /*
-        int opt=1;
 
-        if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(int)) == -1) {
-                perror("Setsockopt Failed");
-                exit(1);
-        }
-        if(bind(sock, (struct sockaddr *)&tcpd_addr, sizeof(struct sockaddr_in)) < 0) {
-                perror("Socket Bind failed");
-                exit(2);
-        }
-
-        */
-
-	/* establish connection with server */
-        /*
-	if(connect(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
-		close(sock);
-		perror("error connecting stream socket");
-		exit(1);
-	}
-        */
-	/* 
-	int file_size = get_file_size(filename);
-	printf("filesize is %d\n", file_size);
-	printf("filename is %s\n", filename);
-	*/
 	file_send(sock,filename,sin_addr);  
 
-	/* write buf to sock */
-	/*
-	if(write(sock, buf, MAXBUF) < 0) {
-		perror("error writing on stream socket");
-		exit(1);
-	}
-	printf("Client sends:    %s\n", buf);
-	*/
-        /*
-	char *buf;
-	buf = (char*)malloc(MAXBUF);
-	if(read(sock, buf, MAXBUF) < 0) {
-		perror("error reading on stream socket");
-		exit(1);
-	}
-	if (close (sock) < 0)
-	{
-		printf ("close socket error\n");
-		return 1;
-	}
-        */
-	//printf("Client receives: %s\n", buf);
-	return 0;
+        return 0;
 
 }
 int get_file_size(char *filename)
 {
-	/*
-	struct stat file_stat;
-	if(stat(filename, &file_stat) != -1)
-	return file_stat.st_size;
-	*/
-	FILE *fp;
+        FILE *fp;
 	int start = 0; /*Read start point*/
 	int file_size = 0;
 	fp = fopen(filename, "rb");
@@ -141,56 +88,75 @@ int get_file_size(char *filename)
 */
 int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
 {
-  int nread;
-  int send_file;
-  char *read_file_buf;
-  read_file_buf = (char*) malloc(MAXBUF);
-  if ((send_file = open (filename, O_RDONLY) )< 0)
-  {
-	  perror ("File open error");
-	  return 1;
-  }
-  bzero(read_file_buf, MAXBUF);
-  int file_size_local = get_file_size(filename);
-  uint32_t file_size = htonl(file_size_local);
-  int sockaddr_in_size = sizeof(struct sockaddr_in);
-  printf("filesize is %d\n", file_size_local);
-  printf("filename is %s\n", filename);
-  bcopy(&sin_addr, read_file_buf, sockaddr_in_size);
-  bcopy(&file_size, read_file_buf+sockaddr_in_size, sizeof(int));
-  bcopy(filename, read_file_buf+sockaddr_in_size+4, 20);
-  if ((nread = read (send_file, read_file_buf+sockaddr_in_size+24, MAXBUF-sockaddr_in_size-24)) < (MAXBUF-sockaddr_in_size-24))
-  {
-	  //send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
-	  SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
-  }
-  else if (nread == (MAXBUF-24-sockaddr_in_size))
-  {
-	  //send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
-	  SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+        int nread;
+        int send_file;
 
-	  for(;;)
-	  {
-		  if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
-		  {
-			  //send (sck, read_file_buf, nread, 0);
-			  SEND (sck, read_file_buf, nread, 0);
-			  /*printf("The nread is %d", nread);*/
-			  break;
-		  }
-		  else
-			  //send (sck, read_file_buf, MAXBUF, 0);
-			  SEND (sck, read_file_buf, MAXBUF, 0);
-	  } 
-  }
-  /*
-  if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF - 24))
-  {
-	  send (sck, read_file_buf, nread+24, 0);
-  }
-  else
-	  send (sck, read_file_buf, MAXBUF, 0);
-  */
-  close (send_file);
-  return 0;
+        char *read_file_buf;
+        read_file_buf = (char*) malloc(MAXBUF);
+
+        TCPD_MSG tcpd_msg;
+        tcpd_msg.tcpd_header = sin_addr;
+
+        if ((send_file = open (filename, O_RDONLY) )< 0)
+        {
+                perror ("File open error");
+                return 1;
+        }
+
+        bzero(read_file_buf, MAXBUF);
+
+        int file_size_local = get_file_size(filename);
+        uint32_t file_size = htonl(file_size_local);
+
+        int sockaddr_in_size = sizeof(struct sockaddr_in);
+
+        printf("filesize is %d\n", file_size_local);
+        printf("filename is %s\n", filename);
+        //        bcopy(&sin_addr, read_file_buf, sockaddr_in_size);
+        //        bcopy(&file_size, read_file_buf+sockaddr_in_size, sizeof(int));
+        //        bcopy(filename, read_file_buf+sockaddr_in_size+4, 20);
+        bcopy(&file_size, read_file_buf, sizeof(int));
+        bcopy(filename, read_file_buf+4, 20);
+
+
+
+        if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF-24))
+        {
+                //send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+                bcopy(read_file_buf,tcpd_msg.tcpd_contents, nread+24);
+                //SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+                SEND (sck, (char *)&tcpd_msg, nread+24+16, 0);
+        }
+        else if (nread == (MAXBUF-24))
+        {
+                //send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+                //SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
+                bcopy(read_file_buf,tcpd_msg.tcpd_contents,nread);
+                SEND (sck, (char *)&tcpd_msg, MAXBUF+16, 0);
+                bzero(read_file_buf, MAXBUF);
+
+                for(;;)
+                {
+                        if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
+                        {
+                                bcopy(read_file_buf,tcpd_msg.tcpd_contents,nread);
+                                //send (sck, read_file_buf, nread, 0);
+                                //SEND (sck, read_file_buf, nread, 0);
+                                SEND (sck, (char *)&tcpd_msg, nread+16, 0);
+                                /*printf("The nread is %d", nread);*/
+                                bzero(read_file_buf, MAXBUF);
+                                break;
+                        }
+                        else
+                        {
+                                bcopy(read_file_buf,tcpd_msg.tcpd_contents,MAXBUF);
+                                //send (sck, read_file_buf, MAXBUF, 0);
+                                //SEND (sck, read_file_buf, MAXBUF, 0);
+                                SEND (sck, (char *)&tcpd_msg, MAXBUF+16, 0);
+                                bzero(read_file_buf, MAXBUF);
+                        }
+                } 
+        }
+close (send_file);
+return 0;
 }
