@@ -111,16 +111,20 @@ int main(int argc, char *argv[])
 		perror("error on write file");
 		exit(1);
 	}
+        struct sockaddr_in test_addr;
+        test_addr.sin_family = AF_INET;
+        test_addr.sin_port = htons(TCPD_PORT);
+        test_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        int test_addr_length = sizeof(struct sockaddr);
+
 	if(nread == MAXBUF)
 	{
 		for(;;)
 		{
-			//if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
-			//if((nread = recv(msgsock, buf, MAXBUF, 0)) < MAXBUF)
-			if((nread = RECV(msgsock, buf, MAXBUF, 0)) < MAXBUF)
+                        if((nread = RECV(sock, buf, MAXBUF, 0)) < MAXBUF)
+                        //if((nread = recvfrom(msgsock, buf, MAXBUF, 0, (struct sockaddr *)&test_addr, &test_addr_length)) < MAXBUF)
 			{
 				write(fd, buf, nread);
-				/*printf("The nread is %d", nread);*/
 				break;
 
 			}

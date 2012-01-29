@@ -80,7 +80,7 @@ int main() /* server program called with no argument */
 //		perror("error on write file");
 //		exit(1);
 //        }
-        if((sendto(sock_troll, (char*)&troll_msg, buflen+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
+        if((sendto(sock_troll, (char*)&troll_msg, buflen+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
                 perror("sending datagram to troll");
                 exit(5);
         }
@@ -113,7 +113,7 @@ int main() /* server program called with no argument */
                                 bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
                                 bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+16);
                                 //write(fd,tcpd_msg.tcpd_contents, MAXBUF);
-                                if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
+                                if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
                                         perror("sending datagram to troll");
                                         exit(5);
                                 }
