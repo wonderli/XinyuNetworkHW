@@ -11,9 +11,9 @@
 #include <unistd.h>
 #include <string.h>
 #endif
-#define TCPD_PORT 3000
-#define TROLL_PORT_M1 4000
-#define TROLL_PORT_M2 5000
+#define TCPD_PORT 3878
+#define TROLL_PORT_M1 3879
+#define TROLL_PORT_M2 3880
 #define MAXBUF 1000
 typedef struct TCPD_MSG {
         struct sockaddr_in tcpd_header;
