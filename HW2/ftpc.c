@@ -95,7 +95,6 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
         read_file_buf = (char*) malloc(MAXBUF);
 
         TCPD_MSG tcpd_msg;
-        tcpd_msg.tcpd_header = sin_addr;
 
         if ((send_file = open (filename, O_RDONLY) )< 0)
         {
@@ -118,6 +117,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
         bcopy(&file_size, read_file_buf, sizeof(int));
         bcopy(filename, read_file_buf+4, 20);
         bzero(&tcpd_msg, sizeof(TCPD_MSG));
+        tcpd_msg.tcpd_header = sin_addr;
 
 
 

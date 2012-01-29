@@ -8,7 +8,7 @@ int main() /* server program called with no argument */
         int buflen = 0;
         //char ftpc_buf1[sizeof(TCPD_MSG)], ftpc_buf[sizeof(TCPD_MSG)];
         char ftpc_buf[sizeof(TCPD_MSG)];
-        int sock_troll, sock_to_troll_len;
+        int sock_troll, troll_addr_len;
         struct sockaddr_in ftpc_addr;
         struct sockaddr_in troll_addr;
         NetMessage troll_msg;
@@ -32,13 +32,14 @@ int main() /* server program called with no argument */
                 perror("Recv(receive from ftpc) socket Bind failed");
                 exit(2);
         }
-        /* create troll_addr with parameters and bind troll_addr to socket */
+        /* create troll_addr with parameters */
         troll_addr.sin_family = AF_INET;
-        troll_addr.sin_port = htons(TROLL_PORT_M2);
+        //troll_addr.sin_port = htons(TROLL_PORT_M2);
+        troll_addr.sin_port = TROLL_PORT_M2;
         troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
         ftpc_addr_len=sizeof(struct sockaddr_in);
-        sock_to_troll_len=sizeof(struct sockaddr_in);
+        troll_addr_len=sizeof(struct sockaddr_in);
 
         //bzero(ftpc_buf1, MAXBUF);
         bzero(ftpc_buf, MAXBUF);
@@ -57,7 +58,7 @@ int main() /* server program called with no argument */
         ftps_addr = tcpd_msg.tcpd_header;
 
        /* Change tcpd_m1 port to satisfy troll*/
-        ftps_addr.sin_port = htons(TROLL_PORT_M2);
+        ftps_addr.sin_port = htons(TROLL_PORT_M1);
         troll_msg.msg_header = ftps_addr;
         bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
 
@@ -78,7 +79,7 @@ int main() /* server program called with no argument */
 		perror("error on write file");
 		exit(1);
         }
-        if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, sock_to_troll_len)) < 0){
+        if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
                 perror("sending datagram to troll");
                 exit(5);
         }
@@ -86,10 +87,6 @@ int main() /* server program called with no argument */
 
         if(buflen == sizeof(TCPD_MSG))
         {
-                //bcopy(ftpc_buf,&tcpd_msg, buflen);
-                //bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, buflen);
-                //write(fd, tcpd_msg.tcpd_contents, buflen-16);
-
                 for(;;)
                 {
                         //if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
@@ -98,17 +95,11 @@ int main() /* server program called with no argument */
                                 //bcopy(ftpc_buf1, &troll_msg.msg_contents, buflen);
                                 bcopy(ftpc_buf,&tcpd_msg, buflen);
                                 bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
-                                /*
-                                if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, sock_to_troll_len)) < 0){
+                                if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
                                         perror("sending datagram to troll");
                                         exit(5);
                                 }
-                                printf("line number 101, Sent to troll\n");
-                                */
-                                write(fd,tcpd_msg.tcpd_contents, buflen-16);
-                                /*        if((nread = recv(msgsock, buf, MAXBUF, 0)) < MAXBUF) */
-                                /*write(fd, ftpc_buf, buflen);*/
-                                /*printf("The nread is %d", nread);*/
+                                //write(fd,tcpd_msg.tcpd_contents, buflen-16);
                                 break;
 
                         }
@@ -120,14 +111,11 @@ int main() /* server program called with no argument */
                                 //bcopy(ftpc_buf1, &troll_msg.msg_contents, MAXBUF);
                                 bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
                                 bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+16);
-                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
-                                /*
-                                if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, sock_to_troll_len)) < 0){
+                                //write(fd,tcpd_msg.tcpd_contents, MAXBUF);
+                                if((sendto(sock_troll, (char*)&troll_msg, sizeof(troll_msg), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
                                         perror("sending datagram to troll");
                                         exit(5);
                                 }
-                                printf("line number 119, Sent to troll\n");
-                                */
                         }
 
 
@@ -138,4 +126,4 @@ int main() /* server program called with no argument */
         close(sock_ftpc);
         close(sock_troll);
         exit(0);
-}
+        }
