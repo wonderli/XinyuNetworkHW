@@ -9,4 +9,4 @@ ftpc: ftpc.c tcpd.h tcpd.c
 ftps: ftps.c tcpd.h tcpd.c
 	gcc -g -o ftps ftps.c tcpd.h tcpd.c
 clean:
-	rm *.o tcpd_m1 tcpd_m2 ftpc ftps *~
+	rm  tcpd_m1 tcpd_m2 ftpc ftps *~

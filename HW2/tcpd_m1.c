@@ -53,7 +53,6 @@ int main() /* server program called with no argument */
         ftps_addr = tcpd_msg.tcpd_header;
         /* create ftps_addr with parameters and bind ftps_addr to socket */
         ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        //bcopy(ftps_buf, &tcpd_msg.tcpd_contents,sizeof(tcpd_contents));
 
         /* The following part is for write file recv data from ftpc*/
         char *ftpc_recv_filename;
@@ -74,7 +73,7 @@ int main() /* server program called with no argument */
         }
         */
         //if((sendto(sock_ftps, ftps_buf, sizeof(ftps_buf), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-        if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, sizeof(tcpd_msg.tcpd_contents), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+        if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
                 perror("sending datagram to ftps");
                 exit(5);
         }
@@ -87,9 +86,9 @@ int main() /* server program called with no argument */
                 {
                         if((buflen = recvfrom(sock_troll, troll_buf, sizeof(troll_buf), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+16+16)){
                                 bcopy(troll_buf,&troll_msg, buflen);
-                                bcopy(&troll_msg.msg_contents, &tcpd_msg, sizeof(troll_msg.msg_contents));
+                                bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
  
-                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, sizeof(tcpd_msg.tcpd_contents), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
                                         perror("sending datagram to ftps");
                                         exit(5);
                                 }
