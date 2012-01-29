@@ -117,6 +117,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
         //        bcopy(filename, read_file_buf+sockaddr_in_size+4, 20);
         bcopy(&file_size, read_file_buf, sizeof(int));
         bcopy(filename, read_file_buf+4, 20);
+        bzero(&tcpd_msg, sizeof(TCPD_MSG));
 
 
 
@@ -131,7 +132,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
         {
                 //send (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
                 //SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
-                bcopy(read_file_buf,tcpd_msg.tcpd_contents,nread);
+                bcopy(read_file_buf,tcpd_msg.tcpd_contents,nread+24);
                 SEND (sck, (char *)&tcpd_msg, MAXBUF+16, 0);
                 bzero(read_file_buf, MAXBUF);
 
