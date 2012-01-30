@@ -1,0 +1,47 @@
+This project contains five compoent:
+        1. ftpc (ftp client, sent packet to tcpd_m2)
+        2. tcpd_m2 (tcpd client part, receive packet from ftpc, sent to troll)
+        3. troll (already provided binary)
+        4. tcpd_m1 (tcpd server part, receive packet from troll, sent to ftps)
+        5. ftps (ftp server, receive packet from tcpd_m1)
+Port define:
+        1. All port defined in tcpd.h file, have defined TCPD_PORT 3860, TROLL_PORT_M1 3870, TROLL_PORT_M2 3880
+        2. The TROLL_PORT_M2 3880 is the troll listen port, when it receive packets from this port, it will forward to the other part according to the packet header.
+Tcpd packet format:
+        Like the Troll packet format, I define a struct which is like the following:
+        typedef struct TCPD_MSG {
+                struct sockaddr_in tcpd_header;
+                char tcpd_contents[MAXBUF];
+        } TCPD_MSG;
+        The MAXBUF is 1000, so the total size of the TCPD_MSG struct is 1016
+
+The data flow procedure:        
+        1. ftpc use the wrap function SEND sent packet by using UDP, the packet format is following the TCPD_MSG.
+        2. tcpd_m2 will listen on TCPD_PORT 3860, when it receive packet it will assemble the packet as the Troll packet format, which is defined in troll.h, then sent to the troll.
+        3. When troll get the packet, it will forward it to another IP address according to the header content.
+        4. tcpd_m1 will listen on TROLL_PORT_M1 3870, when it get the packets sent from troll, it will extract the data from the packet, and send to the ftps.
+        5. ftps use the wrap function RECV to receive any packet sent from the tcpd_m1
+
+How to compile the project:
+        1. linux:
+                make -f Makefile.linux
+        2. stdsun:
+                make
+        After make, it will compile to 4 execute binary files, ftps, ftpc, tcpd_m2, tcpd_m1
+How to run the project:
+        For example stdsun:
+                we have two machine: mu and kappa
+                put ftps and tcpd_m1 to the mu
+                put ftpc and tcpd_m2 and troll provided by class to the kappa
+                on mu run: 
+                        ./tcpd_m1
+                        ./ftps portnumber(for example 9000)
+                on kappa:
+                        ./troll 3880(fixed, defined in tcpd.h, TROLL_PORT_M2)
+                        ./tcpd_m2
+                        ./ftpc mu portnumber(for example 9000) filename (for example 1.jpg)
+                After trasmission finished, you can find the file in the recv folder. Same name as the transmission file.
+                Use md5 can see the filed transfered whether right or not.
+
+                   
+
