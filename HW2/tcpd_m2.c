@@ -61,29 +61,30 @@ int main() /* server program called with no argument */
         ftps_addr.sin_port = htons(TROLL_PORT_M1);
         troll_msg.msg_header = ftps_addr;
         bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
+//        bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
 
         /* The following part is for write file recv data from ftpc*/
-//
-//        char *ftpc_recv_filename;
-//        ftpc_recv_filename = (char*) malloc(20);
-//        strcpy(ftpc_recv_filename, "./recv/troll");
-//        int fd = 0;
-//	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-//        if((fd = open(ftpc_recv_filename, O_WRONLY|O_CREAT, mode))< 0)
-//        {
-//                perror("File open error");
-//                return 1;
-//        }
-//        //if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-ftps_addr_size) < 0)
-//        if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-16) < 0)
-//	{
-//		perror("error on write file");
-//		exit(1);
-//        }
-        if((sendto(sock_troll, (char*)&troll_msg, buflen+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-                perror("sending datagram to troll");
-                exit(5);
-        }
+
+//       char *ftpc_recv_filename;
+//       ftpc_recv_filename = (char*) malloc(20);
+//       strcpy(ftpc_recv_filename, "./recv/troll");
+//       int fd = 0;
+//       mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
+//       if((fd = open(ftpc_recv_filename, O_WRONLY|O_CREAT, mode))< 0)
+//       {
+//               perror("File open error");
+//               return 1;
+//       }
+//       //if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-ftps_addr_size) < 0)
+//       if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-16) < 0)
+//       {
+//               perror("error on write file");
+//               exit(1);
+//       }
+       if((sendto(sock_troll, (char*)&troll_msg, buflen+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
+               perror("sending datagram to troll");
+               exit(5);
+       }
 
 
         if(buflen == sizeof(TCPD_MSG))
@@ -96,11 +97,11 @@ int main() /* server program called with no argument */
                                 //bcopy(ftpc_buf1, &troll_msg.msg_contents, buflen);
                                 bcopy(ftpc_buf,&tcpd_msg, buflen);
                                 bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
-                                if((sendto(sock_troll, (char*)&troll_msg, buflen+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-                                        perror("sending datagram to troll");
-                                        exit(5);
-                                }
-                                //write(fd,tcpd_msg.tcpd_contents, buflen-16);
+                               if((sendto(sock_troll, (char*)&troll_msg, buflen+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
+                                       perror("sending datagram to troll");
+                                       exit(5);
+                               }
+//                                write(fd,tcpd_msg.tcpd_contents, buflen-16);
                                 break;
 
                         }
@@ -112,7 +113,7 @@ int main() /* server program called with no argument */
                                 //bcopy(ftpc_buf1, &troll_msg.msg_contents, MAXBUF);
                                 bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
                                 bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+16);
-                                //write(fd,tcpd_msg.tcpd_contents, MAXBUF);
+//                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
                                 if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
                                         perror("sending datagram to troll");
                                         exit(5);
