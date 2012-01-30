@@ -11,8 +11,8 @@
 #include <unistd.h>
 #include <string.h>
 #endif
-#define TCPD_PORT 3878
-#define TROLL_PORT_M1 3879
+#define TCPD_PORT 3860
+#define TROLL_PORT_M1 3870
 #define TROLL_PORT_M2 3880
 #define MAXBUF 1000
 typedef struct TCPD_MSG {

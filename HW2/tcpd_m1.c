@@ -28,7 +28,8 @@ int main() /* server program called with no argument */
         /* create troll_addr with parameters and bind troll_addr to socket */
         troll_addr.sin_family = AF_INET;
         troll_addr.sin_port = htons(TROLL_PORT_M1);
-        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+//        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        troll_addr.sin_addr.s_addr = INADDR_ANY;        
         if(bind(sock_troll, (struct sockaddr *)&troll_addr, sizeof(troll_addr)) < 0) {
                 perror("Recv(receive from troll) socket Bind failed");
                 exit(2);

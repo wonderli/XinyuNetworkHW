@@ -118,7 +118,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
         bcopy(filename, read_file_buf+4, 20);
         bzero(&tcpd_msg, sizeof(TCPD_MSG));
         tcpd_msg.tcpd_header = sin_addr;
-
+//        bcopy(sin_addr,&tcpd_msg.tcpd_header, sizeof(struct sockaddr_in));
 
 
         if ((nread = read (send_file, read_file_buf+24, MAXBUF-24)) < (MAXBUF-24))
