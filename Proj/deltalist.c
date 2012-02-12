@@ -179,17 +179,17 @@ int expire(linklist *list)
 	}
 	return FALSE;
 }
-int main()
-{
-        linklist *List = create_list();
-        node* a = creat_node(1, 32);
-        node* b = creat_node(2, 44);
-        node* c = creat_node(3, 324);
-        insert_node(List, a);
-        insert_node(List, b);
-        insert_node(List, c);
-        cancel_node(List, 3);
-        print_list(List);
-        return 0;
-}
-
+//int main()
+//{
+//        linklist *List = create_list();
+//        node* a = creat_node(1, 32);
+//        node* b = creat_node(2, 44);
+//        node* c = creat_node(3, 324);
+//        insert_node(List, a);
+//        insert_node(List, b);
+//        insert_node(List, c);
+//        cancel_node(List, 3);
+//        print_list(List);
+//        return 0;
+//}
+//
