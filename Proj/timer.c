@@ -156,20 +156,22 @@ void print_list(linklist *list)
         int seq;
         float time;
         printf("list len is %d\n", list->len);
+        ptr = list->head;
         while(ptr != NULL)
         {
                 seq = ptr->seq;
                 time = ptr->time;
-                printf("(%d, %f\n)->", seq, time);
+                printf("(%d, %f)->", seq, time);
                 ptr = ptr->next;
         }
+        printf("\n");
 }
 int main()
 {
         linklist *List = creat_list();
         node* a = creat_node(1, 100);
-        node* b = creat_node(2, 200);
-        node* c = creat_node(3, 300);
+        node* b = creat_node(2, 400);
+        node* c = creat_node(3, 500);
         insert_node(List, a);
         insert_node(List, b);
         insert_node(List, c);
