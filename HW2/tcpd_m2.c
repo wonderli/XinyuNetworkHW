@@ -60,12 +60,8 @@ int main() /* server program called with no argument */
        /* Change tcpd_m1 port to satisfy troll*/
         ftps_addr.sin_port = htons(TROLL_PORT_M1);
         troll_msg.msg_header = ftps_addr;
-        bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
-        //bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
-	char *sb;
-	sb = (char*)malloc(MAXBUF);
-	bcopy(inet_ntoa(troll_msg.msg_header.sin_addr),sb, sizeof(16));
-	printf("%s", sb);
+       // bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
+        bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
 
         /* The following part is for write file recv data from ftpc*/
 
