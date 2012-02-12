@@ -158,7 +158,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
                                 //SEND (sck, read_file_buf, MAXBUF, 0);
                                 SEND (sck, (char *)&tcpd_msg, MAXBUF+16, 0);
                                 bzero(read_file_buf, MAXBUF);
-                                usleep(10000);
+            //                    usleep(10000);
                         }
                 } 
         }
