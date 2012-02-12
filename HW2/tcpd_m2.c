@@ -58,7 +58,7 @@ int main() /* server program called with no argument */
         ftps_addr = tcpd_msg.tcpd_header;
 
        /* Change tcpd_m1 port to satisfy troll*/
-        ftps_addr.sin_port = htons(TROLL_PORT_M1);
+        ftps_addr.sin_port = htons(TROLL_PORT_M2);
         troll_msg.msg_header = ftps_addr;
         bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
 //        bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
