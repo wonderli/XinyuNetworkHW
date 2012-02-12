@@ -148,7 +148,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
                                 SEND (sck, (char *)&tcpd_msg, nread+16, 0);
                                 /*printf("The nread is %d", nread);*/
                                 bzero(read_file_buf, MAXBUF);
-                                usleep(10000);
+            //                    usleep(10000);
                                 break;
                         }
                         else
