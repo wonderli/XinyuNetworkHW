@@ -19,6 +19,9 @@
 #define MAXBUF 1000
 #define TRUE 1
 #define FALSE 0
+#define START 1
+#define CANCEL 0
+
 typedef struct node
 {
         int time_left;
@@ -37,15 +40,15 @@ typedef struct linklist
 
 struct timeval timout = {0,0};
 
-typedef struct time_msg
+typedef struct TIME_MSG
 {
         int seq;
         int opt;
         long time;
-} time_msg;
+} TIME_MSG;
 
 node* creat_node(int seq, long time);
-linklist* creat_list();
+linklist* create_list();
 int insert_node(linklist *list, node *insert_node);
 int cancel_node(linklist *list, int seq);
 int remove_node(node *remove_node);
