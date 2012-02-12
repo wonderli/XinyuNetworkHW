@@ -127,7 +127,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
                 bcopy(read_file_buf,tcpd_msg.tcpd_contents, nread+24);
                 //SEND (sck, read_file_buf, nread+24+sockaddr_in_size, 0);
                 SEND (sck, (char *)&tcpd_msg, nread+24+16, 0);
-         //       usleep(10000);
+                usleep(10000);
         }
         else if (nread == (MAXBUF-24))
         {
@@ -137,7 +137,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
                 SEND (sck, (char *)&tcpd_msg, MAXBUF+16, 0);
                 bzero(read_file_buf, MAXBUF);
 
-           //     usleep(10000);
+                usleep(10000);
                 for(;;)
                 {
                         if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
@@ -148,7 +148,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
                                 SEND (sck, (char *)&tcpd_msg, nread+16, 0);
                                 /*printf("The nread is %d", nread);*/
                                 bzero(read_file_buf, MAXBUF);
-            //                    usleep(10000);
+                                usleep(10000);
                                 break;
                         }
                         else
@@ -158,7 +158,7 @@ int file_send (int sck, char *filename, struct sockaddr_in sin_addr)
                                 //SEND (sck, read_file_buf, MAXBUF, 0);
                                 SEND (sck, (char *)&tcpd_msg, MAXBUF+16, 0);
                                 bzero(read_file_buf, MAXBUF);
-            //                    usleep(10000);
+                                usleep(10000);
                         }
                 } 
         }
