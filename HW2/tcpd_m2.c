@@ -61,7 +61,8 @@ int main() /* server program called with no argument */
         ftps_addr.sin_port = htons(TROLL_PORT_M1);
         troll_msg.msg_header = ftps_addr;
         bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
-        //bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
+	printf("%s", inet_ntoa(troll_msg.msg_header.sin_addr.s_addr));
+	
 
         /* The following part is for write file recv data from ftpc*/
 
