@@ -1,8 +1,10 @@
 #include "deltalist.h"
+/*
 struct timeval timeout = {
-        0,
+        1,
         0,
 };
+*/
 int main()
 {
         int sock_timer;
@@ -32,19 +34,21 @@ int main()
 
         time_list = create_list();
         fd_set fd_read_set;
-        FD_ZERO(&fd_read_set);
-        FD_SET(sock_timer, &fd_read_set);
         struct timeval tv1, tv2;
         struct timezone tz;
         int time_set_flag = 0;
         int len = sizeof(timer_addr);
+        int MAXFD = sock_timer + 1;
         while(1)
-        {
+        { 
+                FD_ZERO(&fd_read_set);
+                FD_SET(sock_timer, &fd_read_set);
+
                 if(time_set_flag == 0)
                 {
                         gettimeofday(&tv1, &tz);
                 }                
-                if(select(FD_SETSIZE, &fd_read_set, NULL, NULL, &timeout) < 0)
+                if(select(MAXFD, &fd_read_set, NULL, NULL, NULL) < 0)
                 {
                         perror("select error");
                         exit(0);
@@ -98,8 +102,9 @@ int main()
                                         time_list->tail == NULL;
                                 }
                         }
-                        FD_ZERO(&fd_read_set);
-                        FD_SET(sock_timer, &fd_read_set);
+//                        FD_ZERO(&fd_read_set);
+//                        FD_SET(sock_timer, &fd_read_set);
+                        print_list(time_list);
                 }
         }
         close(sock_timer);

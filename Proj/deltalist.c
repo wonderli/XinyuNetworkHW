@@ -41,6 +41,11 @@ int insert_node(linklist *list, node *insert_node)
                 list->len++;
         }else if(insert_node->time <= head->time)
         {
+                if(insert_node->seq == ptr->seq)
+                {
+                        printf("This seq %d node has already exits.", insert_node->seq);
+                        return FALSE;
+                }
                 insert_node->prev = NULL;
                 insert_node->next = head;
                 head->prev = insert_node;
@@ -54,7 +59,12 @@ int insert_node(linklist *list, node *insert_node)
                 {
                         /* inset node seq equals ptr seq*/
                         if(insert_node->seq == ptr->seq)
-                        printf("This %d time node has alread exists.", insert_node->seq);
+                        {
+                        
+                                printf("This seq %d node has alread exists.", insert_node->seq);
+                                return FALSE;
+                        }
+
                         if(insert_node->time <= ptr->time)
                         {
                                 insert_node->prev = ptr->prev;
