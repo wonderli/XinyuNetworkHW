@@ -49,6 +49,7 @@ int main()
                         gettimeofday(&tv1, &tz);
                 }                
                 if(select(MAXFD, &fd_read_set, NULL, NULL, &timeout) < 0)
+                //if(select(MAXFD, &fd_read_set, NULL, NULL, NULL) < 0)
                 {
                         perror("select error");
                         exit(0);
