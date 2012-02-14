@@ -1,10 +1,10 @@
 #include "deltalist.h"
-/*
+
 struct timeval timeout = {
-        1,
         0,
+        1*1e5,
 };
-*/
+
 int main()
 {
         int sock_timer;
@@ -48,7 +48,7 @@ int main()
                 {
                         gettimeofday(&tv1, &tz);
                 }                
-                if(select(MAXFD, &fd_read_set, NULL, NULL, NULL) < 0)
+                if(select(MAXFD, &fd_read_set, NULL, NULL, &timeout) < 0)
                 {
                         perror("select error");
                         exit(0);
@@ -76,12 +76,14 @@ int main()
                         continue;
                 }
                 time_set_flag = 0;
+                timeout.tv_sec = 0;
+                timeout.tv_usec = 1*1e5;
 //                print_list(time_list);
                 if(time_list->len > 0)
                 {
                         gettimeofday(&tv2, &tz);
-                        usleep(1e6 - (tv2.tv_usec - tv1.tv_usec));
-                        time_list->head->time = 1e6 - (tv2.tv_usec - tv1.tv_usec);
+                        usleep(200*1e3 - (tv2.tv_usec - tv1.tv_usec));
+                        time_list->head->time = time_list->head->time - (200*1e3 - (tv2.tv_usec - tv1.tv_usec));
                         if(expire(time_list) == TRUE)
                         {
                                 gettimeofday(&tv2, &tz);
@@ -104,8 +106,8 @@ int main()
                         }
 //                        FD_ZERO(&fd_read_set);
 //                        FD_SET(sock_timer, &fd_read_set);
-                        print_list(time_list);
                 }
+                        print_list(time_list);
         }
         close(sock_timer);
         return 0;
