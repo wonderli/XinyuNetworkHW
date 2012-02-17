@@ -47,9 +47,9 @@ int main()
                 if(time_set_flag == 0)
                 {
                         gettimeofday(&tv1, &tz);
-                }                
+                }
+                /* Receive msg from socket*/
                 if(select(MAXFD, &fd_read_set, NULL, NULL, &timeout) < 0)
-                //if(select(MAXFD, &fd_read_set, NULL, NULL, NULL) < 0)
                 {
                         perror("select error");
                         exit(0);
@@ -61,12 +61,12 @@ int main()
                                 perror("recvfrom TCPD_M2 error");
                                 exit(0);
                         }
-                        if(time_msg_recv.action == CANCEL)
+                        if(time_msg_recv.action == CANCEL) /* Cancel node*/
                         {
                                 printf("cancel node\n");
                                 cancel_node(time_list, time_msg_recv.seq);
                                 print_list(time_list);
-                        }else if(time_msg_recv.action == START)
+                        }else if(time_msg_recv.action == START) /* Add node for timing */
                         {
                                 printf("start node\n");
                                 node *new_node = creat_node(time_msg_recv.seq, time_msg_recv.time);
@@ -79,12 +79,12 @@ int main()
                 time_set_flag = 0;
                 timeout.tv_sec = 0;
                 timeout.tv_usec = 1*1e5;
-//                print_list(time_list);
                 if(time_list->len > 0)
                 {
                         gettimeofday(&tv2, &tz);
                         usleep(200*1e3 - (tv2.tv_usec - tv1.tv_usec));
-                        time_list->head->time = time_list->head->time - (200*1e3 - (tv2.tv_usec - tv1.tv_usec));
+                        /* Update data*/
+                        time_list->head->time = time_list->head->time - (200*1e3 - (tv2.tv_usec - tv1.tv_usec));                        
                         if(expire(time_list) == TRUE)
                         {
                                 gettimeofday(&tv2, &tz);
@@ -105,9 +105,8 @@ int main()
                                         time_list->tail == NULL;
                                 }
                         }
-//                        FD_ZERO(&fd_read_set);
-//                        FD_SET(sock_timer, &fd_read_set);
                 }
+                        /* Print deltalist */
                         print_list(time_list);
         }
         close(sock_timer);

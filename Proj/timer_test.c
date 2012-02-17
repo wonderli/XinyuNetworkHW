@@ -24,12 +24,13 @@ int main(int argc, char* argv[])
         TIME_MSG time_msg_send;
         TIME_MSG time_msg_recv;
 
+        /* Creat new packet*/
         time_msg_send.seq = 1;
         time_msg_send.time = 2*1e6;
         time_msg_send.action = START;
         
 
-
+        /* Send msg to timer*/
         if(sendto(sock, (char *)&time_msg_send, sizeof(TIME_MSG),0, (struct sockaddr*)&sin_addr, sizeof(sin_addr)) < 0)
         {
                 perror("send msg to time error");

@@ -1,4 +1,5 @@
 #include "deltalist.h"
+/* Create new node */
 node* creat_node(int seq, long time)
 {
         node *new_node = NULL;
@@ -16,6 +17,7 @@ node* creat_node(int seq, long time)
         return new_node;
 }
 
+/* Create new deltalist */
 linklist* create_list()
 {
         linklist *new_list = NULL;
@@ -29,6 +31,7 @@ linklist* create_list()
         else
         perror("creat list malloc error");
 }
+/* Insert new node and update list */
 int insert_node(linklist *list, node *insert_node)
 {
         node *head = list->head;
@@ -91,7 +94,7 @@ int insert_node(linklist *list, node *insert_node)
         return TRUE;
 }
 
-
+/* cancel node action */
 int cancel_node(linklist *list, int seq)
 {
         node* head = list->head;
@@ -149,6 +152,8 @@ return TRUE;
 
 
 }
+
+/* Remove node from list */
 int remove_node(node *remove_node)
 {
         if(remove_node != NULL)
@@ -162,6 +167,7 @@ int remove_node(node *remove_node)
         return TRUE;
 }
 
+/* Print list */
 void print_list(linklist *list)
 {
         node *ptr;
@@ -178,6 +184,8 @@ void print_list(linklist *list)
         }
         printf("\n");
 }
+
+/* Test the head of this list whether expired or not*/
 int expire(linklist *list)
 {
 	if(list == NULL)

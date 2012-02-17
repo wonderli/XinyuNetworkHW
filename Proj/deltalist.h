@@ -39,8 +39,7 @@ typedef struct linklist
         node *tail;
 } linklist;
 
-//struct timeval timout = {0,0};
-
+/* Packet data struct */
 typedef struct TIME_MSG
 {
         int seq;
