@@ -1,4 +1,5 @@
 #include "deltalist.h"
+/* Create new node */
 node* creat_node(int seq, long time)
 {
         node *new_node = NULL;
@@ -16,6 +17,7 @@ node* creat_node(int seq, long time)
         return new_node;
 }
 
+/* Create new deltalist */
 linklist* create_list()
 {
         linklist *new_list = NULL;
@@ -29,6 +31,7 @@ linklist* create_list()
         else
         perror("creat list malloc error");
 }
+/* Insert new node and update list */
 int insert_node(linklist *list, node *insert_node)
 {
         node *head = list->head;
@@ -41,9 +44,16 @@ int insert_node(linklist *list, node *insert_node)
                 list->len++;
         }else if(insert_node->time <= head->time)
         {
+                if(insert_node->seq == ptr->seq)
+                {
+                        printf("This seq %d node has already exits.", insert_node->seq);
+                        return FALSE;
+                }
                 insert_node->prev = NULL;
                 insert_node->next = head;
                 head->prev = insert_node;
+                list->head = insert_node;
+                head->time = head->time - insert_node->time;
                 list->len++;
         }
         else
@@ -52,8 +62,13 @@ int insert_node(linklist *list, node *insert_node)
                 {
                         /* inset node seq equals ptr seq*/
                         if(insert_node->seq == ptr->seq)
-                        printf("This %d time node has alread exists.", insert_node->seq);
-                        if(insert_node->seq <= ptr->seq)
+                        {
+                        
+                                printf("This seq %d node has alread exists.", insert_node->seq);
+                                return FALSE;
+                        }
+
+                        if(insert_node->time <= ptr->time)
                         {
                                 insert_node->prev = ptr->prev;
                                 ptr->prev->next = insert_node;
@@ -79,7 +94,7 @@ int insert_node(linklist *list, node *insert_node)
         return TRUE;
 }
 
-
+/* cancel node action */
 int cancel_node(linklist *list, int seq)
 {
         node* head = list->head;
@@ -137,6 +152,8 @@ return TRUE;
 
 
 }
+
+/* Remove node from list */
 int remove_node(node *remove_node)
 {
         if(remove_node != NULL)
@@ -150,6 +167,7 @@ int remove_node(node *remove_node)
         return TRUE;
 }
 
+/* Print list */
 void print_list(linklist *list)
 {
         node *ptr;
@@ -166,6 +184,8 @@ void print_list(linklist *list)
         }
         printf("\n");
 }
+
+/* Test the head of this list whether expired or not*/
 int expire(linklist *list)
 {
 	if(list == NULL)
@@ -175,21 +195,23 @@ int expire(linklist *list)
 	else
 	{
 		if(list->head->time <= 0)
+                {
 			return TRUE;
+                }
 	}
 	return FALSE;
 }
-int main()
-{
-        linklist *List = create_list();
-        node* a = creat_node(1, 32);
-        node* b = creat_node(2, 44);
-        node* c = creat_node(3, 324);
-        insert_node(List, a);
-        insert_node(List, b);
-        insert_node(List, c);
-        cancel_node(List, 3);
-        print_list(List);
-        return 0;
-}
-
+//int main()
+//{
+//        linklist *List = create_list();
+//        node* a = creat_node(1, 32);
+//        node* b = creat_node(2, 44);
+//        node* c = creat_node(3, 324);
+//        insert_node(List, a);
+//        insert_node(List, b);
+//        insert_node(List, c);
+//        cancel_node(List, 3);
+//        print_list(List);
+//        return 0;
+//}
+//

@@ -19,8 +19,9 @@
 #define MAXBUF 1000
 #define TRUE 1
 #define FALSE 0
-#define START 1
 #define CANCEL 0
+#define START 1
+#define EXPIRE 2
 
 typedef struct node
 {
@@ -38,12 +39,11 @@ typedef struct linklist
         node *tail;
 } linklist;
 
-struct timeval timout = {0,0};
-
+/* Packet data struct */
 typedef struct TIME_MSG
 {
         int seq;
-        int opt;
+        int action;
         long time;
 } TIME_MSG;
 
