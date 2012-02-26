@@ -38,9 +38,10 @@ int main() /* server program called with no argument */
         ftps_addr_len=sizeof(struct sockaddr_in);
         troll_addr_len=sizeof(struct sockaddr_in);
 
-        //bzero(troll_buf1, MAXBUF);
-        bzero(troll_buf, MAXBUF+16+16);
-        bzero(troll_msg.msg_contents,MAXBUF+16);
+        bzero(troll_buf, MAXBUF+sizeof(struct sockaddr_in)+(struct sockaddr_in));
+        //bzero(troll_buf, MAXBUF+16+16);
+        //bzero(troll_msg.msg_contents,MAXBUF+16);
+        bzero(troll_msg.msg_contents,MAXBUF+sizeof(struct sockaddr_in));
         bzero(tcpd_msg.tcpd_contents, MAXBUF);
 
         if((buflen = recvfrom(sock_troll, troll_buf, sizeof(troll_buf), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < 0){
@@ -48,9 +49,8 @@ int main() /* server program called with no argument */
                 exit(4);
         }
         bcopy(troll_buf, &troll_msg, buflen);
-//        bcopy(&troll_msg.msg_contents, &tcpd_msg, sizeof(troll_msg.msg_contents));
-        bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
-        //        bcopy(troll_buf, &tcpd_msg, buflen);
+        //bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
+        bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-sizeof(struct sockaddr_in));
         /* Get ftps IP address, struct sockaddr_in*/
         int ftps_addr_size = sizeof(struct sockaddr_in);
         ftps_addr = tcpd_msg.tcpd_header;
@@ -73,7 +73,12 @@ int main() /* server program called with no argument */
 //                perror("error on write file");
 //                exit(1);
 //        }
-        if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+
+
+
+
+        //if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+        if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-sizeof(struct sockaddr_in)-sizeof(struct sockaddr_in), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
                 perror("sending datagram to ftps");
                 exit(5);
         }
@@ -86,11 +91,18 @@ int main() /* server program called with no argument */
 
                 for(;;)
                 {
-                        if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+16+16)){
+
+                        //if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+16+16)){
+
+                        if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+sizeof(struct sockaddr_in)+sizeof(sockaddr_in))){
                                 bcopy(troll_buf,&troll_msg, buflen);
-                                bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
+
+                                //bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
+
+                                bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-sizeof(sockaddr_in));
                                
-                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+                                //if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-sizeof(sockaddr_in)-sizeof(sockaddr_in), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
                                         perror("sending datagram to ftps");
                                         exit(5);
                                 }
@@ -102,8 +114,12 @@ int main() /* server program called with no argument */
                         }
                         else
                         {
-                                bcopy(troll_buf,&troll_msg, MAXBUF+16+16);
-                                bcopy(&troll_msg.msg_contents, &tcpd_msg, MAXBUF+16);
+                                //bcopy(troll_buf,&troll_msg, MAXBUF+16+16);
+
+                                bcopy(troll_buf,&troll_msg, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in));
+
+                                //bcopy(&troll_msg.msg_contents, &tcpd_msg, MAXBUF+16);
+                                bcopy(&troll_msg.msg_contents, &tcpd_msg, MAXBUF+sizeof(struct sockaddr_in));
 
 //                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
                                 if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, MAXBUF, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
