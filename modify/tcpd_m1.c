@@ -38,7 +38,7 @@ int main() /* server program called with no argument */
         ftps_addr_len=sizeof(struct sockaddr_in);
         troll_addr_len=sizeof(struct sockaddr_in);
 
-        bzero(troll_buf, MAXBUF+sizeof(struct sockaddr_in)+(struct sockaddr_in));
+        bzero(troll_buf, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in));
         //bzero(troll_buf, MAXBUF+16+16);
         //bzero(troll_msg.msg_contents,MAXBUF+16);
         bzero(troll_msg.msg_contents,MAXBUF+sizeof(struct sockaddr_in));
@@ -94,15 +94,15 @@ int main() /* server program called with no argument */
 
                         //if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+16+16)){
 
-                        if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+sizeof(struct sockaddr_in)+sizeof(sockaddr_in))){
+                        if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in))){
                                 bcopy(troll_buf,&troll_msg, buflen);
 
                                 //bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
 
-                                bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-sizeof(sockaddr_in));
+                                bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-sizeof(struct sockaddr_in));
                                
                                 //if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-sizeof(sockaddr_in)-sizeof(sockaddr_in), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
+                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-sizeof(struct sockaddr_in)-sizeof(struct sockaddr_in), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
                                         perror("sending datagram to ftps");
                                         exit(5);
                                 }
