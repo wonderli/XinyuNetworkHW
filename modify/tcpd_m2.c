@@ -115,8 +115,11 @@ int main() /* server program called with no argument */
                                 * write(fd, ftpc_buf, MAXBUF);
                                 */
                                 //bcopy(ftpc_buf1, &troll_msg.msg_contents, MAXBUF);
-                                bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
-                                bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+16);
+                                
+				//bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
+                                
+				bcopy(ftpc_buf,&tcpd_msg, MAXBUF+sizeof(struct sockaddr_in));
+                                bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+sizeof(struct sockaddr_in));
 //                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
                                 
 				//if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
