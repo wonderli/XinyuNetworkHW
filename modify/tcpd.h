@@ -14,7 +14,10 @@
 #define TCPD_PORT 3860
 #define TROLL_PORT_M1 3870
 #define TROLL_PORT_M2 3880
+#define CONTROL_PORT_M2 4200
 #define MAXBUF 1000
+#define TRUE 1
+#define FALSE 0
 typedef struct packet_data {
         int seq_num;
         int ack;
@@ -25,20 +28,23 @@ typedef struct packet_data {
         int stop;
         char data[MAXBUF];
 } PACKET_DATA;
-typedef struct packet {
-        struct sockaddr_in msg_header;
-        PACKET_DATA msg;
-        unsigned long checksum;
-} PACKET;
+//typedef struct packet {
+//        struct sockaddr_in msg_header;
+//        PACKET_DATA msg;
+//        unsigned long checksum;
+//} PACKET;
 typedef struct TCPD_MSG {
+        //struct sockaddr_in tcpd_header;
+	//struct packet packet;
         struct sockaddr_in tcpd_header;
-        char tcpd_contents[sizeof(struct packet)];
-
+        PACKET_DATA packet;
+        unsigned long checksum;
 } TCPD_MSG;
 typedef struct troll_msg {
 	struct sockaddr_in troll_header;
-	char msg_contents[sizeof(struct TCPD_MSG)];
+	struct TCPD_MSG tcpd_msg;
 } TROLL_MSG;
 
 int SEND(int socket, const void *buffer, size_t len, int flags);
-int RECEIVE(int socket, void *buffer, size_t length, int flags);
+int RECV(int socket, void *buffer, size_t length, int flags);
+int RECV_CONTROL(int socket, void *buffer, size_t len, int flags);
