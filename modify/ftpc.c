@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
         /*tcpd address setup*/
         tcpd_addr.sin_family = AF_INET;
-        tcpd_addr.sin_port = htons(TCPD_PORT);
+        tcpd_addr.sin_port = htons(TCPD_PORT_M2);
         tcpd_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
         int control_sock;
