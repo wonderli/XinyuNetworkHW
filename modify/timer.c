@@ -7,42 +7,55 @@ struct timeval timeout = {
 
 int main()
 {
-        int sock_timer;
+        //int sock_timer;
+        int sock_timer_recv;
+	int sock_timer_send;
         int timer_addr_len;
         TIME_MSG time_msg_recv;
 //        char timer_buf[sizeof(TIME_MSG)];
         TIME_MSG time_msg_send;
-        struct sockaddr_in timer_addr;
+        struct sockaddr_in timer_recv_addr;
+        struct sockaddr_in timer_send_addr;
 //        struct sockaddr_in timer_addr;
         linklist *time_list;
-        if((sock_timer = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
+        if((sock_timer_recv = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
         {
                 perror("opening datagram socket for recv from tcpd_m1");
         }
-        timer_addr.sin_family = AF_INET;
-        timer_addr.sin_port = htons(TIMER_PORT);
-        timer_addr.sin_addr.s_addr = INADDR_ANY;
+        timer_recv_addr.sin_family = AF_INET;
+        timer_recv_addr.sin_port = htons(TIMER_RECV_PORT);
+        timer_recv_addr.sin_addr.s_addr = INADDR_ANY;
+	
+//        printf("PORT IS %d\n", timer_addr.sin_port);
 
-        printf("PORT IS %d\n", timer_addr.sin_port);
 
-
-        if(bind(sock_timer, (struct sockaddr *)&timer_addr, sizeof(timer_addr)) < 0)
+        if(bind(sock_timer_recv, (struct sockaddr *)&timer_addr, sizeof(timer_addr)) < 0)
         {
                 perror("RECV(receive from tcpd_m2) socket Bind failed");
                 exit(0);
         }
+
+	if((sock_timer_send = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
+        {
+                perror("opening datagram socket for recv from tcpd_m1");
+        }
+        timer_send_addr.sin_family = AF_INET;
+        timer_send_addr.sin_port = htons(TIMER_SEND_PORT);
+        timer_send_addr.sin_addr.s_addr = INADDR_ANY;
+
+
 
         time_list = create_list();
         fd_set fd_read_set;
         struct timeval tv1, tv2;
         struct timezone tz;
         int time_set_flag = 0;
-        int len = sizeof(timer_addr);
-        int MAXFD = sock_timer + 1;
+        int len = sizeof(timer_recv_addr);
+        int MAXFD = sock_timer_recv + 1;
         while(1)
         { 
                 FD_ZERO(&fd_read_set);
-                FD_SET(sock_timer, &fd_read_set);
+                FD_SET(sock_timer_recv, &fd_read_set);
 
                 if(time_set_flag == 0)
                 {
@@ -54,9 +67,9 @@ int main()
                         perror("select error");
                         exit(0);
                 }
-                if(FD_ISSET(sock_timer, &fd_read_set))
+                if(FD_ISSET(sock_timer_recv, &fd_read_set))
                 {
-                        if(recvfrom(sock_timer, (char *)&time_msg_recv, sizeof(time_msg_recv), 0, (struct sockaddr*)&timer_addr, &len) < 0)
+                        if(recvfrom(sock_timer_recv, (char *)&time_msg_recv, sizeof(time_msg_recv), 0, (struct sockaddr*)&timer_recv_addr, &len) < 0)
                         {
                                 perror("recvfrom TCPD_M2 error");
                                 exit(0);
@@ -104,12 +117,20 @@ int main()
                                 {
                                         time_list->tail == NULL;
                                 }
+
+				if(sendto(sock_timer_send, &time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
+				{
+					perror("\nTIMER SEND ERROR\n");
+					exit(1);
+				}
+
                         }
                 }
                         /* Print deltalist */
                         print_list(time_list);
         }
-        close(sock_timer);
+        close(sock_timer_recv);
+        close(sock_timer_send);
         return 0;
 
 }

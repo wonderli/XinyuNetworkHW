@@ -30,7 +30,7 @@ int window_empty()
 
 }
 
-int main() /* server program called with no argument */
+int main(int argc, char* argv[]) /* server program called with no argument */
 {
         int sock_ftpc, ftpc_addr_len;
         int buflen = 0;
@@ -42,10 +42,13 @@ int main() /* server program called with no argument */
 
         struct sockaddr_in ftpc_addr;
         struct sockaddr_in control_addr;
-        struct sockaddr_in troll_m1_addr;
-        struct sockaddr_in troll_m2_addr;
+        //struct sockaddr_in troll_m1_addr;
+        //struct sockaddr_in troll_m1_addr;
+        //struct sockaddr_in troll_m2_addr;
+        struct sockaddr_in troll_addr;
         struct sockaddr_in timer_send_addr;
         struct sockaddr_in timer_recv_addr;
+	struct sockaddr_in ack_addr;
 
         fd_set read_fds;
 
@@ -67,6 +70,7 @@ int main() /* server program called with no argument */
         int index = 0;
 	unsigned short recv_checksum;
 	int i = 0;
+	int j = 0;
 
 
 
@@ -91,7 +95,7 @@ int main() /* server program called with no argument */
                 exit(1);
         }
         control_addr.sin_family = AF_INET;
-        control_addr.sin_port = htons(CONTROL_PORT_M2);
+        control_addr.sin_port = htons(CONTROL_PORT);
         control_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
         if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -141,6 +145,7 @@ int main() /* server program called with no argument */
         ftpc_addr_len=sizeof(struct sockaddr_in);
         troll_addr_len=sizeof(struct sockaddr_in);
 	ack_addr_len=sizeof(struct sockaddr_in);
+	int timer_recv_addr_len = sizeof(struct sockaddr_in);
 
 //        if((buflen = recvfrom(sock_ftpc, (void *)&tcpd_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < 0){
 //                perror("error receiving from ftpc"); 
@@ -156,9 +161,9 @@ int main() /* server program called with no argument */
                 perror("Unknown host");
                 exit(1);
         }
-        ftps_addr.sin_family = htons(AF_INET);
-        bcopy(hp->h_addr, (char*) ftps_addr, hp->h_length);
-        ftps_addr.sin_port = htons(TCPD_PORT_M1);
+        ftps_addr.sin_family = AF_INET;
+        bcopy(hp->h_addr, (char*)&ftps_addr, hp->h_length);
+        ftps_addr.sin_port = htons(TROLL_PORT_M1);
 
 
         if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -204,7 +209,7 @@ int main() /* server program called with no argument */
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = crc((void *)&buffer[head].packet, sizeof(struct packet_data));
                         index = locate_in_buffer(window[ptr]);
-                        sendto(sock_troll, (void *)buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
+                        sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
 			gettimeofday(&time_start, NULL);
 			timer_send.time = RTO(time_remain, buffer[index].packet.seq_num);
 			timer_send.action = START;
@@ -227,14 +232,15 @@ int main() /* server program called with no argument */
 
 
                 }//END SOCK_FTPC
-		
+
+		// IF PACKET RECEIVED or RETRANSMISSION
 		if(FD_ISSET(sock_ack, &read_fds))
 		{
 			gettimeofday(&time_end, NULL);
 			time_remain = RTT(&time_start, &time_end);
-			recvfrom(sock_ack, (void*)&ack_msg; (struct sockaddr *)&ack_addr, &ack_addr_len);
+			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
 			recv_checksum = crc((void*)&ack_msg.packet, sizeof(struct packet_data));
-			if(ack_msg.packet.checksum == recv_checksum)
+			if(ack_msg.checksum == recv_checksum)
 			{
 				if(ack_msg.packet.ack_seq = 1)
 				{
@@ -247,7 +253,7 @@ int main() /* server program called with no argument */
 					{
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
-							window[k] = 0;
+							window[i] = 0;
 						}
 					}
 					if(window_empty())
@@ -265,9 +271,9 @@ int main() /* server program called with no argument */
 					{
 						ack_msg.packet.stop = 1;
 						sendto(sock_control, (void*)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
-						time_msg_send.seq = ack_msg.packet.ack_seq;
-						time_msg_send.action = CANCEL;
-						time_msg_send.time = 0;
+						timer_send.seq = ack_msg.packet.ack_seq;
+						timer_send.action = CANCEL;
+						timer_send.time = 0;
 						sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
 						close(sock_troll);
 						close(sock_ftpc);
@@ -276,6 +282,38 @@ int main() /* server program called with no argument */
 					
 				}//END ACKMSG FIN_ACK
 			}//END ACKMSG CHECKSUM
+
+			// IF PACKET EXPIRED
+			if(FD_ISSET(sock_timer_recv, &read_fds))
+			{
+				
+				if(recvfrom(sock_timer_recv, &timer_recv, sizeof(timer_recv), 0, (struct sockaddr *)&timer_recv_addr, &timer_recv_addr_len) > 0)
+				{
+					printf("\n PACKET SEQ NUM: %d HAS EXPIRED\n", timer_recv.seq_num);
+
+				}
+				for(i = 0; i < 20; i++)
+				{
+					if(window[i] == timer_recv.seq_num)
+					{
+						for(j = 0; j < 64; j++)
+						{
+
+							if((buffer[j].packet.seq_num == timer_recv.seq_num) && (buffer[j].packet.seq_num != -1))
+							{
+								printf("\nRESEND TO BUFFER\n");
+								resend_pkt = j;
+							}
+						}//END FOR
+					}//END if window
+				}//END for 
+				sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
+				gettimeofday(&time_start, NULL);
+				timer_send.time = RTO(time_remain, buffer[resend_pkt].packet.seq_num);
+				timer_send.seq_no = buffer[resend_pkt].packet.seq_num;
+				timer_send.action = START;
+				sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(timer_send_addr));
+			}
 		}
 		FD_ZERO(&read_fds);
 		FD_SET(sock_ftpc, &read_fds);

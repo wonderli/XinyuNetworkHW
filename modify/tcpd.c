@@ -28,7 +28,8 @@ int RECV_CONTROL(int socket, void *buffer, size_t len, int flags) {
 	struct sockaddr_in srv_addr;
 //	struct hostent *hp;
 	srv_addr.sin_family = AF_INET;
-	srv_addr.sin_port = htons(CONTROL_PORT_M2);
+	//srv_addr.sin_port = htons(CONTROL_PORT_M2);
+	srv_addr.sin_port = htons(CONTROL_PORT);
 	srv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	int srv_addr_length = sizeof(struct sockaddr_in);
         int ret;
@@ -51,7 +52,7 @@ float RTO(float M, int packet_ctrl)
 	if(packet_ctrl == 0)
 	{
 		RTO = 6000;
-		return rto;
+		return RTO;
 	}
 	else if(packet_ctrl == 1)
 	{
@@ -71,7 +72,7 @@ float RTO(float M, int packet_ctrl)
 	{
 		Err = M - A;
 		A = A + g * Err;
-		D = D + h * (abs(Err)-d); 
+		D = D + h * (abs(Err)-D); 
 		RTO = A + 4 * D;
 		return RTO;
 	}

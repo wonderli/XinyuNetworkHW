@@ -56,16 +56,16 @@ int main(int argc, char *argv[])
 
         /*tcpd address setup*/
         tcpd_addr.sin_family = AF_INET;
-        tcpd_addr.sin_port = htons(TCPD_PORT_M2);
+        tcpd_addr.sin_port = htons(TCPD_PORT);
         tcpd_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
-        int control_sock;
-        if((control_sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+        int sock_control;
+        if((sock_control = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
                 perror("error openting datagram socket");
                 exit(1);
         }
         control_addr.sin_family = AF_INET;
-        control_addr.sin_port = htons(CONTROL_PORT_M2);
+        control_addr.sin_port = htons(CONTROL_PORT);
         control_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
         if(bind(sock_control, (struct sockaddr *)&control_addr, sizeof(struct sockaddr_in)) < 0) {
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	file_send(sock,control_sock,filename,sin_addr, control_addr);  
+	file_send(sock,sock_control, filename,sin_addr, control_addr);  
 
         return 0;
 
@@ -135,7 +135,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
         bzero(&send_msg, sizeof(TCPD_MSG));
 
         send_msg.tcpd_header = sin_addr;
-        send_msg.msg.seq_num = 0;
+        send_msg.packet.seq_num = 0;
 //        bcopy(&file_size, send_msg.msg.data, sizeof(int));
 //        bcopy(filename, send_msg.msg.data+4, 20);
         bcopy(&file_size, read_file_buf, sizeof(int));
@@ -156,7 +156,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                 if(FD_ISSET(control_sck, &read_fds))
                 {
                         RECV_CONTROL(control_sck, &recv_msg, sizeof(TCPD_MSG), 0);
-                        if(recv_msg.msg.stop == 1)
+                        if(recv_msg.packet.stop == 1)
                         {
                                 printf("\nreceive stop signal, stop sending msg\n");
                                 usleep(10000);
@@ -186,7 +186,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                         {
                                                 if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
                                                 {
-                                                        send_msg.packet.data.seq_num++;
+                                                        send_msg.packet.seq_num ++;
                                                         send_msg.packet.length = nread;
                                                         bcopy(read_file_buf,send_msg.packet.data,nread);
                                                         //SEND (sck, (char *)&send_msg, nread+sizeof(struct sockaddr_in), 0);
@@ -199,7 +199,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                 }
                                                 else
                                                 {
-                                                        send_msg.packet.data.seq_num++;
+                                                        send_msg.packet.seq_num++;
                                                         send_msg.packet.length = nread;
                                                         bcopy(read_file_buf,send_msg.packet.data,MAXBUF);
                                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
@@ -210,9 +210,9 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                         if(FILE_EOF == TRUE)
                                         {
                                                 bzero(send_msg.packet.data, MAXBUF);
-                                                send_msg.packet.data.fin = 1;
-                                                send_msg.packet.data.length = 0;
-                                                send_msg.packet.data.seq_num++;
+                                                send_msg.packet.fin = 1;
+                                                send_msg.packet.length = 0;
+                                                send_msg.packet.seq_num++;
                                                 SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
                                                 close(send_file);
                                                 close(sck);
