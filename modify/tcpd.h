@@ -52,3 +52,6 @@ typedef struct troll_msg {
 int SEND(int socket, const void *buffer, size_t len, int flags);
 int RECV(int socket, void *buffer, size_t length, int flags);
 int RECV_CONTROL(int socket, void *buffer, size_t len, int flags);
+float RTO(float M, int packet_ctrl);
+float RTT(struct timeval *start, struct timeval *end);
+

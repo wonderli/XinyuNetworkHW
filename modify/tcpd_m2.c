@@ -14,6 +14,21 @@ int locate_in_buffer(int seq_num)
         }
         return i;
 }
+int window_empty()
+{
+	int empty_flag = 0;
+	int  i = 0;
+	for(i = 0; i < 20; i++)
+	{
+		if(window[i] != 0)
+			empty_flag++;
+	}
+	if(empty_flag == 0)
+		return TRUE;
+	else 
+		return FALSE;
+
+}
 
 int main() /* server program called with no argument */
 {
@@ -35,6 +50,8 @@ int main() /* server program called with no argument */
         fd_set read_fds;
 
         TCPD_MSG tcpd_msg;
+	TCPD_MSG control_msg;
+	TCPD_MSG ack_msg;
         //TROLL_MSG troll_msg;
 
         TIME_MSG timer_send;
@@ -42,11 +59,15 @@ int main() /* server program called with no argument */
         
         struct timeval time_start, time_end, diff;
         float start, end;
+	float time_remain;
         int resend_pkt;
         int head = 0;
         int tail = 0;
         int ptr = 0;
         int index = 0;
+	unsigned short recv_checksum;
+	int i = 0;
+
 
 
 
@@ -119,6 +140,7 @@ int main() /* server program called with no argument */
 
         ftpc_addr_len=sizeof(struct sockaddr_in);
         troll_addr_len=sizeof(struct sockaddr_in);
+	ack_addr_len=sizeof(struct sockaddr_in);
 
 //        if((buflen = recvfrom(sock_ftpc, (void *)&tcpd_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < 0){
 //                perror("error receiving from ftpc"); 
@@ -183,253 +205,81 @@ int main() /* server program called with no argument */
                         buffer[head].checksum = crc((void *)&buffer[head].packet, sizeof(struct packet_data));
                         index = locate_in_buffer(window[ptr]);
                         sendto(sock_troll, (void *)buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
+			gettimeofday(&time_start, NULL);
+			timer_send.time = RTO(time_remain, buffer[index].packet.seq_num);
+			timer_send.action = START;
+			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
+			
+			ptr++;
+			head = (head + 1) % 64;
+			if(ptr >= 19)
+			{
+				printf("\nWINDOW FULL, SLEEP\n");
+				control_msg.packet.stop = 1;
+				sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+			}
+			else
+			{
+				printf("\nWINDOW NOT FULL, KEEP SENDING\n");
+				control_msg.packet.stop = 0;
+				sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+			}
 
-                        
 
-                }
-        
-
+                }//END SOCK_FTPC
+		
+		if(FD_ISSET(sock_ack, &read_fds))
+		{
+			gettimeofday(&time_end, NULL);
+			time_remain = RTT(&time_start, &time_end);
+			recvfrom(sock_ack, (void*)&ack_msg; (struct sockaddr *)&ack_addr, &ack_addr_len);
+			recv_checksum = crc((void*)&ack_msg.packet, sizeof(struct packet_data));
+			if(ack_msg.packet.checksum == recv_checksum)
+			{
+				if(ack_msg.packet.ack_seq = 1)
+				{
+					//Delete this seq from Timer
+					timer_send.seq = ack_msg.packet.seq_num;
+					timer_send.action = CANCEL;
+					timer_send.time = 0;//Don't whether this will work or not
+					sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
+					for(i = 0; i < 20; i++)
+					{
+						if(window[i] == ack_msg.packet.ack_seq);
+						{
+							window[k] = 0;
+						}
+					}
+					if(window_empty())
+					{
+						control_msg.packet.stop = 0;//WINDOW EMPTY, KEEP SENDING
+						ptr = 0;//Make pointer back to begin
+						sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+					}
+				}
+				if(ack_msg.packet.fin_ack == 1)
+				{
+					printf("\nREACHED TO FUN\n");
+					recvfrom(sock_ack, (void *)&ack_msg, sizeof(ack_msg), 0, (struct sockaddr *)&ack_msg, &ack_addr_len);
+					if(strcmp(ack_msg.packet.data, "FIN"))
+					{
+						ack_msg.packet.stop = 1;
+						sendto(sock_control, (void*)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+						time_msg_send.seq = ack_msg.packet.ack_seq;
+						time_msg_send.action = CANCEL;
+						time_msg_send.time = 0;
+						sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
+						close(sock_troll);
+						close(sock_ftpc);
+						exit(0);
+					}
+					
+				}//END ACKMSG FIN_ACK
+			}//END ACKMSG CHECKSUM
+		}
+		FD_ZERO(&read_fds);
+		FD_SET(sock_ftpc, &read_fds);
+		FD_SET(sock_timer_send, &read_fds);
+		FD_SET(sock_ack, &read_fds);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       if((sendto(sock_troll, (char*)&troll_msg, buflen+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-               perror("sending datagram to troll");
-               exit(5);
-       }
-
-
-        if(buflen == sizeof(TCPD_MSG))
-        {
-                for(;;)
-                {
-                        //if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
-                        //if((buflen = recvfrom(sock_ftpc, ftpc_buf1, MAXBUF, 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < MAXBUF){
-                        if((buflen = recvfrom(sock_ftpc, ftpc_buf, sizeof(ftpc_buf), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < (MAXBUF+16)){
-                                //bcopy(ftpc_buf1, &troll_msg.msg_contents, buflen);
-                                bcopy(ftpc_buf,&tcpd_msg, buflen);
-                                bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
-                               //if((sendto(sock_troll, (char*)&troll_msg, buflen+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-                               if((sendto(sock_troll, (char*)&troll_msg, buflen+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-                                       perror("sending datagram to troll");
-                                       exit(5);
-                               }
-//                                write(fd,tcpd_msg.tcpd_contents, buflen-16);
-                                break;
-
-                        }
-                        else
-                        {
-                                /*
-                                * write(fd, ftpc_buf, MAXBUF);
-                                */
-                                //bcopy(ftpc_buf1, &troll_msg.msg_contents, MAXBUF);
-                                
-				//bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
-                                
-				bcopy(ftpc_buf,&tcpd_msg, MAXBUF+sizeof(struct sockaddr_in));
-                                bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+sizeof(struct sockaddr_in));
-//                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
-                                
-				//if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-                                if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-                                        perror("sending datagram to troll");
-                                        exit(5);
-                                }
-                        }
-
-
-                }
-        }
-
-
-        close(sock_ftpc);
-        close(sock_troll);
-        exit(0);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//        int sock_ftpc, ftpc_addr_len;
-//        int buflen = 0;
-//        //char ftpc_buf1[sizeof(TCPD_MSG)], ftpc_buf[sizeof(TCPD_MSG)];
-//        char ftpc_buf[sizeof(TCPD_MSG)];
-//        int sock_troll, troll_addr_len;
-//        struct sockaddr_in ftpc_addr;
-//        struct sockaddr_in troll_addr;
-//        NetMessage troll_msg;
-//        TCPD_MSG tcpd_msg;
-//        /*create from ftpc socket*/
-//        if((sock_ftpc = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-//                perror("opening datagram socket for recv from ftpc");
-//                exit(1);
-//        }
-//        /*create troll socket*/
-//        if((sock_troll = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-//                perror("opening datagram socket for send to troll");
-//                exit(1);
-//        }
-//
-//        /* create ftpc_addr with parameters and bind ftpc_addr to socket */
-//        ftpc_addr.sin_family = AF_INET;
-//        ftpc_addr.sin_port = htons(TCPD_PORT);
-//        ftpc_addr.sin_addr.s_addr = INADDR_ANY;
-//        if(bind(sock_ftpc, (struct sockaddr *)&ftpc_addr, sizeof(ftpc_addr)) < 0) {
-//                perror("Recv(receive from ftpc) socket Bind failed");
-//                exit(2);
-//        }
-//        /* create troll_addr with parameters */
-//        troll_addr.sin_family = AF_INET;
-//        //troll_addr.sin_port = htons(TROLL_PORT_M2);
-//        troll_addr.sin_port = htons(TROLL_PORT_M2);
-//        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-//
-//        ftpc_addr_len=sizeof(struct sockaddr_in);
-//        troll_addr_len=sizeof(struct sockaddr_in);
-//
-//        //bzero(ftpc_buf1, MAXBUF);
-//        bzero(ftpc_buf, MAXBUF);
-//        bzero(tcpd_msg.tcpd_contents, MAXBUF);
-//        bzero(troll_msg.msg_contents,MAXBUF);
-//
-//        if((buflen = recvfrom(sock_ftpc, ftpc_buf, sizeof(ftpc_buf), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < 0){
-//                perror("error receiving from ftpc"); 
-//                exit(4);
-//        }
-//        bcopy(ftpc_buf,&tcpd_msg, sizeof(ftpc_buf));
-//        /* Get ftps IP address, struct sockaddr_in*/
-//        struct sockaddr_in ftps_addr;
-//        int ftps_addr_size = sizeof(struct sockaddr_in);
-//
-//        ftps_addr = tcpd_msg.tcpd_header;
-//
-//       /* Change tcpd_m1 port to satisfy troll*/
-//        ftps_addr.sin_port = htons(TROLL_PORT_M1);
-//        troll_msg.msg_header = ftps_addr;
-//        //bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(troll_msg));
-//        bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
-//
-//        /* The following part is for write file recv data from ftpc*/
-//
-////       char *ftpc_recv_filename;
-////       ftpc_recv_filename = (char*) malloc(20);
-////       strcpy(ftpc_recv_filename, "./recv/troll");
-////       int fd = 0;
-////       mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-////       if((fd = open(ftpc_recv_filename, O_WRONLY|O_CREAT, mode))< 0)
-////       {
-////               perror("File open error");
-////               return 1;
-////       }
-////       //if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-ftps_addr_size) < 0)
-////       if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-16) < 0)
-////       {
-////               perror("error on write file");
-////               exit(1);
-////       }
-//
-//
-//       //if((sendto(sock_troll, (char*)&troll_msg, buflen+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-//       if((sendto(sock_troll, (char*)&troll_msg, buflen+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-//               perror("sending datagram to troll");
-//               exit(5);
-//       }
-//
-//
-//        if(buflen == sizeof(TCPD_MSG))
-//        {
-//                for(;;)
-//                {
-//                        //if((nread = read(msgsock, buf, MAXBUF)) < MAXBUF)
-//                        //if((buflen = recvfrom(sock_ftpc, ftpc_buf1, MAXBUF, 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < MAXBUF){
-//                        if((buflen = recvfrom(sock_ftpc, ftpc_buf, sizeof(ftpc_buf), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < (MAXBUF+16)){
-//                                //bcopy(ftpc_buf1, &troll_msg.msg_contents, buflen);
-//                                bcopy(ftpc_buf,&tcpd_msg, buflen);
-//                                bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, sizeof(tcpd_msg));
-//                               //if((sendto(sock_troll, (char*)&troll_msg, buflen+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-//                               if((sendto(sock_troll, (char*)&troll_msg, buflen+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-//                                       perror("sending datagram to troll");
-//                                       exit(5);
-//                               }
-////                                write(fd,tcpd_msg.tcpd_contents, buflen-16);
-//                                break;
-//
-//                        }
-//                        else
-//                        {
-//                                /*
-//                                * write(fd, ftpc_buf, MAXBUF);
-//                                */
-//                                //bcopy(ftpc_buf1, &troll_msg.msg_contents, MAXBUF);
-//                                
-//				//bcopy(ftpc_buf,&tcpd_msg, MAXBUF+16);
-//                                
-//				bcopy(ftpc_buf,&tcpd_msg, MAXBUF+sizeof(struct sockaddr_in));
-//                                bcopy((char*)&tcpd_msg, &troll_msg.msg_contents, MAXBUF+sizeof(struct sockaddr_in));
-////                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
-//                                
-//				//if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-//                                if((sendto(sock_troll, (char*)&troll_msg, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, troll_addr_len)) < 0){
-//                                        perror("sending datagram to troll");
-//                                        exit(5);
-//                                }
-//                        }
-//
-//
-//                }
-//        }
-//
-//
-//        close(sock_ftpc);
-//        close(sock_troll);
-//        exit(0);
 }
