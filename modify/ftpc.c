@@ -202,8 +202,8 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                         send_msg.packet.seq_num++;
                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
                                         close(send_file);
-                                        //close(sck);
-                                        //exit(0);
+                                        close(sck);
+                                        exit(0);
                                 }
 
                         }//end else
