@@ -193,8 +193,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         FD_SET(sock_ftpc, &read_fds);
         FD_SET(sock_timer_recv, &read_fds);
         FD_SET(sock_ack, &read_fds);
-        control_msg.packet.stop = 0;
-        sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+        //control_msg.packet.stop = 0;
+        //sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
 
         while(1)
         {
