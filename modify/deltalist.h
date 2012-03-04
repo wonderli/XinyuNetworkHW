@@ -32,7 +32,7 @@
 #define TIMER_SEND_PORT 4300
 #endif
 #ifndef TIMER_RECV_PORT
-#define TIMER_RECV_PORT 4300
+#define TIMER_RECV_PORT 4400
 #endif
 #define MAXBUF 1000
 #define TRUE 1

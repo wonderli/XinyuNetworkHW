@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 	struct sockaddr_in sin_addr; /* structure for socket name setup */
 	char* buf;
 	buf = (char*)malloc(MAXBUF);
+	TCPD_MSG recv_msg;
 	if(argc < 2) {
 		printf("Usage: ftps <local-port>\n");
 		exit(1);
@@ -75,7 +76,8 @@ int main(int argc, char *argv[])
 	/* read from msgsock and place in buf */
 	int nread = 0; /* the number read from socket*/
 	/*if((nread = read(msgsock, buf, MAXBUF)) < 0) { */ 
-	if((nread = RECV(sock, buf, MAXBUF,0)) < 0) {
+	//if((nread = RECV(sock, buf, MAXBUF,0)) < 0) {
+	if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	} 
@@ -86,9 +88,11 @@ int main(int argc, char *argv[])
 	uint32_t file_size_local = 0;
 	filename = (char*)malloc(20);
 	filepath = (char*)malloc(MAXBUF);
-	bcopy(buf, &file_size, sizeof(int));
+	//bcopy(buf, &file_size, sizeof(int));
+	bcopy(&recv_msg.packet.data, &file_size, sizeof(int));
 	file_size_local = ntohl(file_size);
-	bcopy(buf+4, filename, 20);
+	//bcopy(buf+4, filename, 20);
+	bcopy(&recv_msg.packet.data+4, filename, 20);
 	strcpy(filepath, "./recv/");
 	strcat(filepath, filename);
 	printf("The file length is %d\n", file_size_local);
@@ -106,7 +110,8 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if(write(fd,buf+24, nread-24) < 0)
+	//if(write(fd,buf+24, nread-24) < 0)
+	if(write(fd,&recv_msg.packet.data+24, sizeof(recv_msg.packet.data)-24) < 0)
 	{
 		perror("error on write file");
 		exit(1);
@@ -117,37 +122,24 @@ int main(int argc, char *argv[])
         test_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         int test_addr_length = sizeof(struct sockaddr);
 
-	if(nread == MAXBUF)
+	for(;;)
 	{
-		for(;;)
-		{
-                        if((nread = RECV(sock, buf, MAXBUF, 0)) < MAXBUF)
-                        //if((nread = recvfrom(msgsock, buf, MAXBUF, 0, (struct sockaddr *)&test_addr, &test_addr_length)) < MAXBUF)
-			{
-				write(fd, buf, nread);
-				break;
+		bzero(recv_msg.packet.data, MAXBUF);
 
-			}
-			else 
-				write(fd, buf, MAXBUF);
+		RECV(sock, &recv_msg, sizeof(TCPD_MSG), 0);
+		if(recv_msg.packet.fin == 1)
+		{
+			printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size_local);
+			close(fd);
+			close(sock);
+			exit(0);
 
 		}
+			write(fd, recv_msg.packet.data, MAXBUF);
+
 	}
-	close(fd);
-	/* write message back to client 
-	char *buf2;
-	buf2 = (char *)malloc(MAXBUF);
-	strcpy(buf2, "Transfer finished\n");
-	if(write(sock, buf2, MAXBUF) < 0) {
-		perror("error writing on stream socket");
-		exit(1);
-	}
-        *printf("\n%s\n", buf2);*/
-	printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size_local);
 	
 	/* close all connections and remove socket file */
-	close(msgsock);
-	close(sock);
 	return 0;
 }
 
