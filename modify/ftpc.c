@@ -168,8 +168,8 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                         else
                         {
                                 bzero(send_msg.packet.data, MAXBUF);
-                                for(;;)
-                                {
+//                                for(;;)
+//                                {
                                         if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
                                         {
                                                 send_msg.packet.seq_num ++;
@@ -181,7 +181,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                 bzero(send_msg.packet.data, MAXBUF);
                                                 FILE_EOF = TRUE;
                                                 printf("\nIN THE LAST SEQ: %d\n", send_msg.packet.seq_num);
-                                                break;
+   //                                             break;
                                         }
                                         else
                                         {
@@ -193,7 +193,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                 bzero(read_file_buf, MAXBUF);
                                                 bzero(send_msg.packet.data, MAXBUF);
                                         }
-                                } 
+  //                              } 
                                 if(FILE_EOF == TRUE)
                                 {
                                         bzero(send_msg.packet.data, MAXBUF);
