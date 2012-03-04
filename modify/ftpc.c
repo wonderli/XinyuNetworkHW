@@ -167,32 +167,33 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                         }
                         else
                         {
-                                if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
-                                {
-                                        send_msg.packet.length = nread;
-                                        send_msg.packet.seq_num++;
-                                        bcopy(read_file_buf,send_msg.packet.data, nread+24);
-                                        //SEND (sck, (char *)&send_msg, nread+24+sizeof(struct sockaddr_in), 0);
-                                        SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
-                                        usleep(10000);
-
-                                        bzero(send_msg.packet.data, MAXBUF);
-                                        send_msg.packet.fin = 1;
-                                        send_msg.packet.length = 0;
-                                        send_msg.packet.seq_num++;
-                                        SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
-
-                                }
-                                else if (nread == MAXBUF)
-                                {
-                                        send_msg.packet.seq_num++;
-                                        send_msg.packet.length = nread;
-                                        bcopy(read_file_buf,send_msg.packet.data,nread+24);
-                                        //SEND (sck, (char *)&send_msg, MAXBUF+sizeof(struct sockaddr_in), 0);
-                                        SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
-                                        bzero(read_file_buf, MAXBUF);
-
+//                                if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
+//                                {
+//                                        send_msg.packet.length = nread;
+//                                        send_msg.packet.seq_num++;
+//                                        bcopy(read_file_buf,send_msg.packet.data, nread+24);
+//                                        //SEND (sck, (char *)&send_msg, nread+24+sizeof(struct sockaddr_in), 0);
+//                                        SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
 //                                        usleep(10000);
+//
+//                                        bzero(send_msg.packet.data, MAXBUF);
+//                                        send_msg.packet.fin = 1;
+//                                        send_msg.packet.length = 0;
+//                                        send_msg.packet.seq_num++;
+//                                        SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
+//
+//                                }
+//                                else if (nread == MAXBUF)
+//                                {
+//                                        send_msg.packet.seq_num++;
+//                                        send_msg.packet.length = nread;
+//                                        bcopy(read_file_buf,send_msg.packet.data,nread+24);
+//                                        //SEND (sck, (char *)&send_msg, MAXBUF+sizeof(struct sockaddr_in), 0);
+//                                        SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
+//                                        bzero(read_file_buf, MAXBUF);
+//
+//                                        usleep(10000);
+                                bzero(send_msg.packet.data, MAXBUF);
                                         for(;;)
                                         {
                                                 if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
@@ -203,6 +204,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
                                                         /*printf("The nread is %d", nread);*/
                                                         bzero(read_file_buf, MAXBUF);
+                                                        bzero(send_msg.packet.data, MAXBUF);
 //                                                        usleep(10000);
                                                         FILE_EOF = TRUE;
                                                         break;
@@ -214,6 +216,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                         bcopy(read_file_buf,send_msg.packet.data,MAXBUF);
                                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
                                                         bzero(read_file_buf, MAXBUF);
+                                                        bzero(send_msg.packet.data, MAXBUF);
 //                                                        usleep(10000);
                                                 }
                                         } 
@@ -227,7 +230,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                 close(send_file);
                                                 close(sck);
                                         }
-                                }//END else if
+//                                }//END else if
 
                         }//end else
 
