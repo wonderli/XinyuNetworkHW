@@ -111,16 +111,21 @@ int main(int argc, char *argv[])
 	}
 
 	//if(write(fd,buf+24, nread-24) < 0)
-	if(write(fd,&recv_msg.packet.data+24, sizeof(recv_msg.packet.data)-24) < 0)
+	if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
+		perror("error reading on stream socket");
+		exit(1);
+	} 
+
+	if(write(fd,&recv_msg.packet.data, sizeof(recv_msg.packet.data) < 0))
 	{
 		perror("error on write file");
 		exit(1);
 	}
         struct sockaddr_in test_addr;
-        test_addr.sin_family = AF_INET;
-        test_addr.sin_port = htons(TCPD_PORT);
-        test_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        int test_addr_length = sizeof(struct sockaddr);
+//        test_addr.sin_family = AF_INET;
+//        test_addr.sin_port = htons(TCPD_PORT);
+//        test_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+//        int test_addr_length = sizeof(struct sockaddr);
 
 	for(;;)
 	{
