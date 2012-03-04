@@ -137,13 +137,11 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
 
         send_msg.tcpd_header = sin_addr;
         send_msg.packet.seq_num = 0;
-//        bcopy(&file_size, send_msg.msg.data, sizeof(int));
-//        bcopy(filename, send_msg.msg.data+4, 20);
+
         bcopy(&file_size, read_file_buf, sizeof(int));
         bcopy(filename, read_file_buf+4, 20);
 
-//        SEND(sck,&send_msg,sizeof(TCPD_MSG),0);
-        SEND(sck,&send_msg,sizeof(TCPD_MSG),0);
+        //SEND(sck,&send_msg,sizeof(TCPD_MSG),0);
         int FILE_EOF = FALSE;
         
         FD_ZERO(&read_fds);
