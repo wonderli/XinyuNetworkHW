@@ -201,7 +201,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
 					ack.tcpd_header = ack_addr;
 					ack.packet.fin_ack = 1;
-					ack.packet.ack = 1;
+					ack.packet.ack = 0;
 					ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
 					ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
 					window_srv[lowest_seq_window_index] = -1;

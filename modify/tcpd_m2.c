@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         int sock_control, control_addr_len;
         int sock_ack, ack_addr_len;
         int sock_timer_send;
-        int sock_timer_recv;
+        int sock_timer_recv, timer_recv_addr_len;
 
         struct sockaddr_in ftpc_addr;
         struct sockaddr_in control_addr;
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(2);
         }
 
-        /*create control to socket*/
+        /*create control socket*/
         if((sock_control = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
                 perror("opening datagram socket for recv from ftpc");
                 exit(1);
@@ -128,6 +128,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         timer_recv_addr.sin_family = AF_INET;
         timer_recv_addr.sin_port = htons(TIMER_RECV_PORT);
         timer_recv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
         if(bind(sock_timer_recv, (struct sockaddr *)&timer_recv_addr, sizeof(timer_recv_addr)) < 0) {
                 perror("timer recv socket Bind failed");
                 exit(2);
@@ -147,15 +148,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         ftpc_addr_len=sizeof(struct sockaddr_in);
         troll_addr_len=sizeof(struct sockaddr_in);
 	ack_addr_len=sizeof(struct sockaddr_in);
-	int timer_recv_addr_len = sizeof(struct sockaddr_in);
+	timer_recv_addr_len = sizeof(struct sockaddr_in);
 
-//        if((buflen = recvfrom(sock_ftpc, (void *)&tcpd_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len)) < 0){
-//                perror("error receiving from ftpc"); 
-//                exit(4);
-//        }
         /* Get ftps IP address, struct sockaddr_in*/
         struct sockaddr_in ftps_addr;
         int ftps_addr_size = sizeof(struct sockaddr_in);
+
         struct hostent *hp;
         hp = gethostbyname(argv[1]);
         if(hp == 0)
@@ -163,15 +161,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 perror("Unknown host");
                 exit(1);
         }
+
         ftps_addr.sin_family = AF_INET;
         bcopy(hp->h_addr, (void*)&ftps_addr.sin_addr, hp->h_length);
         ftps_addr.sin_port = htons(TCPD_PORT_M1);
 
 
-        if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-                perror("opening datagram socket for send to troll");
-                exit(1);
-        }
 
         /* The following part is for write file recv data from ftpc*/
 
@@ -197,6 +192,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         FD_SET(sock_ftpc, &read_fds);
         FD_SET(sock_timer_recv, &read_fds);
         FD_SET(sock_ack, &read_fds);
+
         while(1)
         {
                 if(select(FD_SETSIZE, &read_fds, NULL, NULL, NULL) < 0)
@@ -207,18 +203,29 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 if(FD_ISSET(sock_ftpc, &read_fds))
                 {
                         buflen = recvfrom(sock_ftpc, (void *)&buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len);
+                        printf("\nRECVFROM FTPC: SEQ: %d\n", buffer[head].packet.seq_num);
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
-                        index = locate_in_buffer(window[ptr]);
+                        for(i = 0; i < 64; i++)
+                        {
+                                if(buffer[i].packet.seq_num == window[ptr])
+                                {
+                                        index = i;
+                                        break;
+                                }
+
+                        }
+                        //index = locate_in_buffer(window[ptr]);
                         sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
+
 			gettimeofday(&time_start, NULL);
 			timer_send.time = RTO(time_remain, buffer[index].packet.seq_num);
 			timer_send.action = START;
 			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
 			
-			ptr++;
-			head = (head + 1) % 64;
+			ptr++;//move window index
+			head = (head + 1) % 64;//wrap buffer
 			if(ptr >= 19)
 			{
 				printf("\nWINDOW FULL, SLEEP\n");
@@ -240,8 +247,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 		{
 			gettimeofday(&time_end, NULL);
 			time_remain = RTT(&time_start, &time_end);
+
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
 			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
+
 			if(ack_msg.checksum == recv_checksum)
 			{
 				if(ack_msg.packet.ack_seq = 1)
@@ -249,15 +258,17 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					//Delete this seq from Timer
 					timer_send.seq = ack_msg.packet.seq_num;
 					timer_send.action = CANCEL;
-					timer_send.time = 0;//Don't whether this will work or not
+					timer_send.time = 0;//Don't know whether this will work or not
 					sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
+
 					for(i = 0; i < 20; i++)
 					{
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
-							window[i] = 0;
+							window[i] = 0;//RECV ACK
 						}
 					}
+
 					if(window_empty())
 					{
 						control_msg.packet.stop = 0;//WINDOW EMPTY, KEEP SENDING
@@ -267,12 +278,13 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				}
 				if(ack_msg.packet.fin_ack == 1)
 				{
-					printf("\nREACHED TO FUN\n");
-					recvfrom(sock_ack, (void *)&ack_msg, sizeof(ack_msg), 0, (struct sockaddr *)&ack_msg, &ack_addr_len);
+					printf("\nREACHED TO FINISH\n");
+					recvfrom(sock_ack, (void *)&ack_msg, sizeof(ack_msg), 0, (struct sockaddr *)&ack_msg, &ack_addr_len);//WAITING FOR FIN ACK
 					if(strcmp(ack_msg.packet.data, "FIN"))
 					{
-						ack_msg.packet.stop = 1;
+						control_msg.packet.stop = 1;
 						sendto(sock_control, (void*)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+
 						timer_send.seq = ack_msg.packet.ack_seq;
 						timer_send.action = CANCEL;
 						timer_send.time = 0;
@@ -294,7 +306,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					printf("\n PACKET SEQ NUM: %d HAS EXPIRED\n", timer_recv.seq);
 
 				}
-				for(i = 0; i < 20; i++)
+				for(i = 0; i < 20; i++)//ITERATE WINDOW
 				{
 					if(window[i] == timer_recv.seq)
 					{
@@ -306,10 +318,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 								printf("\nRESEND TO BUFFER\n");
 								resend_pkt = j;
 							}
-						}//END FOR
+						}//END
 					}//END if window
-				}//END for 
+				}//END ITERATE
+
 				sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
+
 				gettimeofday(&time_start, NULL);
 				timer_send.time = RTO(time_remain, buffer[resend_pkt].packet.seq_num);
 				timer_send.seq = buffer[resend_pkt].packet.seq_num;
