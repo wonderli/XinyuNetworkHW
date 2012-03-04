@@ -104,6 +104,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	while(1)
 	{
 		recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
+                printf("\nRECV FROM TROLL_M2, SEQ:%d\n", recv_buffer[head].packet.seq_num);
 
 		checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
 
