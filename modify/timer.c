@@ -29,7 +29,7 @@ int main()
 //        printf("PORT IS %d\n", timer_addr.sin_port);
 
 
-        if(bind(sock_timer_recv, (struct sockaddr *)&timer_addr, sizeof(timer_addr)) < 0)
+        if(bind(sock_timer_recv, (struct sockaddr *)&timer_recv_addr, sizeof(timer_recv_addr)) < 0)
         {
                 perror("RECV(receive from tcpd_m2) socket Bind failed");
                 exit(0);

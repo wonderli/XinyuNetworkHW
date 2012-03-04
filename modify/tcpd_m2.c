@@ -3,6 +3,7 @@
 #include "tcpd.h"
 #include "troll.h"
 #include "deltalist.h"
+#include "crc.h"
 struct TCPD_MSG buffer[64];
 int window[20];
 int locate_in_buffer(int seq_num)
@@ -208,7 +209,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         buflen = recvfrom(sock_ftpc, (void *)&buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len);
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
-                        buffer[head].checksum = crc((void *)&buffer[head].packet, sizeof(struct packet_data));
+                        buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
                         index = locate_in_buffer(window[ptr]);
                         sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
 			gettimeofday(&time_start, NULL);
@@ -240,7 +241,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			gettimeofday(&time_end, NULL);
 			time_remain = RTT(&time_start, &time_end);
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
-			recv_checksum = crc((void*)&ack_msg.packet, sizeof(struct packet_data));
+			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
 			if(ack_msg.checksum == recv_checksum)
 			{
 				if(ack_msg.packet.ack_seq = 1)
