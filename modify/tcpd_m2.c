@@ -250,6 +250,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 		// IF PACKET RECEIVED or RETRANSMISSION
 		if(FD_ISSET(sock_ack, &read_fds))
 		{
+                        printf("\nGET ACK\n");
 			gettimeofday(&time_end, NULL);
 			time_rem = RTT(&time_start, &time_end);
 

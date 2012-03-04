@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					{
 						ack_exist = TRUE;
 					}
+                                }      
 
 					if(ack_exist == TRUE)
 					{
@@ -153,7 +154,6 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 						}
 					}
-				}
 			}//end if ack_flag
 			else if(ack_buffer_flag == TRUE)
 			{
