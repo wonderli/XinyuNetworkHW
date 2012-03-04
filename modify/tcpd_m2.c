@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         }       
         timer_recv_addr.sin_family = AF_INET;
         timer_recv_addr.sin_port = htons(TIMER_RECV_PORT);
-        timer_recv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+        timer_recv_addr.sin_addr.s_addr = INADDR_ANY;
 
         if(bind(sock_timer_recv, (struct sockaddr *)&timer_recv_addr, sizeof(timer_recv_addr)) < 0) {
                 perror("timer recv socket Bind failed");
@@ -221,6 +221,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
 
 			gettimeofday(&time_start, NULL);
+			timer_send.seq = buffer[index].packet.seq_num;
 			timer_send.time = RTO(time_remain, buffer[index].packet.seq_num);
 			timer_send.action = START;
 			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
