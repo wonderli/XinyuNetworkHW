@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         
         struct timeval time_start, time_end, diff;
         float start, end;
-	float time_remain;
+	float time_remain = 0;
         int resend_pkt;
         int head = 0;
         int tail = 0;
