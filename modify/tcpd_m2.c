@@ -103,7 +103,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(1);
         }
         ack_addr.sin_family = AF_INET;
-        ack_addr.sin_port = htons(TROLL_PORT_M1);
+        //ack_addr.sin_port = htons(TROLL_PORT_M1);
+        ack_addr.sin_port = htons(TCPD_PORT_M2);
         ack_addr.sin_addr.s_addr = INADDR_ANY;
         if(bind(sock_ack, (struct sockaddr *)&ack_addr, sizeof(ack_addr)) < 0) {
                 perror("ACK socket Bind failed");
@@ -162,8 +163,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(1);
         }
         ftps_addr.sin_family = AF_INET;
-        bcopy(hp->h_addr, (char*)&ftps_addr, hp->h_length);
-        ftps_addr.sin_port = htons(TROLL_PORT_M1);
+        bcopy(hp->h_addr, (void*)&ftps_addr.sin_addr, hp->h_length);
+        ftps_addr.sin_port = htons(TCPD_PORT_M1);
 
 
         if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {

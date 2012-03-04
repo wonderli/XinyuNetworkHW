@@ -12,17 +12,14 @@
 #include <unistd.h>
 #include <string.h>
 #endif
-//#define TCPD_PORT 3860
-/*
+#ifndef TCPD_PORT
+#define TCPD_PORT 3850
+#endif
 #ifndef TCPD_PORT_M1
 #define TCPD_PORT_M1 3860
 #endif
 #ifndef TCPD_PORT_M2
 #define TCPD_PORT_M2 3870
-#endif
-*/
-#ifndef TCPD_PORT
-#define TCPD_PORT 3870
 #endif
 #ifndef TROLL_PORT_M1
 #define TROLL_PORT_M1 3880

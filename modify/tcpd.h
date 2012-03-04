@@ -11,9 +11,9 @@
 #include <unistd.h>
 #include <string.h>
 #endif
-//#define TCPD_PORT_M1 3860
-//#define TCPD_PORT_M2 3870
-#define TCPD_PORT 3870
+#define TCPD_PORT 3850
+#define TCPD_PORT_M1 3860
+#define TCPD_PORT_M2 3870
 #define TROLL_PORT_M1 3880
 #define TROLL_PORT_M2 3890
 //#define CONTROL_PORT_M1 4100

@@ -1,140 +1,229 @@
 /*client part of TCPD*/
 /*connection port is 3110*/
+#include "deltalist.h"
 #include "tcpd.h"
 #include "troll.h"
-int main() /* server program called with no argument */
+#include "crc.h"
+int window_srv[20];
+int ptr = 0;
+int ack_buffer[64];
+TCPD_MSG recv_buffer[64];
+int main(int argc, char* argv[]) /* server program called with no argument */
 {
         int sock_ftps, ftps_addr_len;
+	int sock_from_troll, from_troll_addr_len;
+	int sock_ack, ack_addr_len;
+	unsigned long checksum = 0;
+
         int buflen = 0;
-        //char troll_buf1[sizeof(TCPD_MSG)], troll_buf[sizeof(TCPD_MSG)];
-        //char troll_buf[sizeof(TCPD_MSG)];
-        char troll_buf[sizeof(NetMessage)];
-        int sock_troll, troll_addr_len;
+	int head = 0;
+	int tail = 0;
+	
         struct sockaddr_in ftps_addr;
-        struct sockaddr_in troll_addr;
-        NetMessage troll_msg;
-        TCPD_MSG tcpd_msg;
+        struct sockaddr_in troll_m2_addr;
+	struct sockaddr_in troll_m1_addr;
+	struct sockaddr_in ack_addr;
+	struct hostent *hp;
+	hp = gethostbyname(argv[1]);
+	if(hp == 0)
+	{
+		perror("Unknown host");
+		exit(1);
+	}
+
+        TCPD_MSG tcpd_recv;
+	TCPD_MSG ack;
+	TCPD_MSG tcpd_send;
+	int i = 0;
+	int j = 0;
+	int crc_match = FALSE;
+	int ack_buffer_flag = FALSE;
+	int ack_exist = FALSE;
+	int window_index = 0;
+
+
+	int lowest_seq = 100000; 
+	int lowest_seq_window_index = 0;
+	int lastsent;
+	
+	//init window
+	for(i = 0; i < 20; i++)
+	{
+		window_srv[i] = -1;
+	}
+	//init ack
+	for(j = 0; j < 64; j++)
+	{
+		ack_buffer[j] = -1;
+	}
+	
         /*create from ftpc socket*/
         if((sock_ftps = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
                 perror("opening datagram socket for recv from ftpc");
                 exit(1);
         }
         /*create troll socket*/
-        if((sock_troll = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        if((sock_from_troll = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
                 perror("opening datagram socket for send to troll");
                 exit(1);
         }
 
         /* create troll_addr with parameters and bind troll_addr to socket */
-        troll_addr.sin_family = AF_INET;
-        troll_addr.sin_port = htons(TROLL_PORT_M1);
-//        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        troll_addr.sin_addr.s_addr = INADDR_ANY;        
-        if(bind(sock_troll, (struct sockaddr *)&troll_addr, sizeof(troll_addr)) < 0) {
+        troll_m2_addr.sin_family = AF_INET;
+        troll_m2_addr.sin_port = htons(TROLL_PORT_M1);
+        troll_m2_addr.sin_addr.s_addr = INADDR_ANY;        
+
+        if(bind(sock_from_troll, (struct sockaddr *)&troll_m2_addr, sizeof(troll_m2_addr)) < 0) {
                 perror("Recv(receive from troll) socket Bind failed");
                 exit(2);
         }
 
-        ftps_addr_len=sizeof(struct sockaddr_in);
-        troll_addr_len=sizeof(struct sockaddr_in);
+	if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		perror("opening datagram socket for send to troll");
+		exit(1);
+	}
 
-        bzero(troll_buf, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in));
-        //bzero(troll_buf, MAXBUF+16+16);
-        //bzero(troll_msg.msg_contents,MAXBUF+16);
-        bzero(troll_msg.msg_contents,MAXBUF+sizeof(struct sockaddr_in));
-        bzero(tcpd_msg.tcpd_contents, MAXBUF);
+	troll_m1_addr.sin_family = AF_INET;
+	troll_m1_addr.sin_port = htons(TROLL_PORT_M2);
+	troll_m1_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
 
-        if((buflen = recvfrom(sock_troll, troll_buf, sizeof(troll_buf), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < 0){
-                perror("error receiving from ftpc"); 
-                exit(4);
-        }
-        bcopy(troll_buf, &troll_msg, buflen);
-        //bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
-        bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-sizeof(struct sockaddr_in));
-        /* Get ftps IP address, struct sockaddr_in*/
-        int ftps_addr_size = sizeof(struct sockaddr_in);
-        ftps_addr = tcpd_msg.tcpd_header;
-        /* create ftps_addr with parameters and bind ftps_addr to socket */
-        ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-        /* The following part is for write file recv data from ftpc*/
-//        char *ftpc_recv_filename;
-//        ftpc_recv_filename = (char*) malloc(20);
-//        strcpy(ftpc_recv_filename, "./recv/troll");
-//        int fd = 0;
-//        mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-//        if((fd = open(ftpc_recv_filename, O_WRONLY|O_CREAT, mode))< 0)
-//        {
-//                perror("File open error");
-//                return 1;
-//        }
-//        if(write(fd,tcpd_msg.tcpd_contents+24, buflen-24-16-16) < 0)
-//        {
-//                perror("error on write file");
-//                exit(1);
-//        }
+	//Contruct troll header
+	ack_addr.sin_family = AF_INET;
+	ack_addr.sin_port = htons(TCPD_PORT_M2);
+	bcopy(hp->h_addr, (void*)&ack_addr.sin_addr, hp->h_length);
 
 
 
+	ftps_addr_len=sizeof(struct sockaddr_in);
+	from_troll_addr_len=sizeof(struct sockaddr_in);
+	ack_addr_len  = sizeof(struct sockaddr_in);
+	while(1)
+	{
+		recvfrom(sock_from_troll, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
+		checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data), 0);
+		if(checksum == recv_buffer[head].checksum)
+		{
+			crc_match = TRUE;
+			ack_buffer_flag = FALSE;
+			for(i = 0; i< 64; i++)
+			{
+				if(ack_buffer[i] == recv_buffer[head].packetdata.seq_num)
+				{
+					ack_buffer_flag = TRUE;
+				}
+			}
+			if(ack_buffer_flag != TRUE)
+			{
+				ack_exist = FALSE;
+				for(i = 0; i < 20; i++)
+				{
+					if(window_srv[i] == recv_buffer[head].packet.seq_num)
+					{
+						ack_exist = TRUE;
+					}
 
-        //if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-        if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-sizeof(struct sockaddr_in)-sizeof(struct sockaddr_in), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-                perror("sending datagram to ftps");
-                exit(5);
-        }
+					if(ack_exist == TRUE)
+					{
+						printf("\nIN THE WINDOWS, WILL ARRIVE\n",recv_buffer[head].packet.seq_num);
+					}
+					else if(ack_exist == FALSE)//ack not in window
+					{
+						window_index = recv_buffer[head].packet.seq_num % 20;
+						window_srv[window_index] = recv_buffer[head].packet.seq_num;
+						if(head < 63)
+						{
+							head++;
+						}
+						else
+						{
+							head = 0;//Make buffer back
 
-        bzero(&tcpd_msg,sizeof(TCPD_MSG));
+						}
 
+					}
 
-        if(buflen == sizeof(NetMessage))
-        {
+				}
+			}//end if ack_flag
+			else if(ack_buffer_flag == TRUE)
+			{
+				ack.packet.ack = 1;
+				ack.packet.ack_seq = recv_buffer[head].packet.seq_num;
+				ack.tcpd_header = ack_addr;
+				ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+				sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
+			}
+		}
 
-                for(;;)
-                {
+		if(crc_match == TRUE)
+		{
+			//find the lowest window seq;
+			for(i = 0; i < 20; i++)
+			{
+				if(window_srv[i] < lowest_seq && window_srv[i] != -1)
+				{
+					lowest_seq = window_srv[i];
+					lowest_seq_window_index = i;
+				}
+			}
+			if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
+			{
+				int buffer_index = 0;
+				for(i = tail; i < 64; i++)
+				{
+					if(recv_buffer[i].packet.seq_num == lowest_seq)
+					{
+						buffer_index = i;
+					}
+				}
+				sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
+				if(recv_buffer[buffer_index].packet.fin != 1)
+				{
+					ack.packet.ack = 1;
+					ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
+					lastsent = recv_buffer[buffer_index].packet.seq_num;
+					ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
+					if(ptr < 63)
+					{
+						ptr++;
+					}
+					else
+					{
+						ptr = 0;
+					}
+					ack.checksum = cal_crc((void*)&ack.packet, sizeof(struct packet));
+					ack.tcpd_header = ack_addr; 
+					sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
+					window_srv[lowest_seq_window_index] = -1;
+				}//end if fin != 1
+				else if(recv_buffer[buffer_index].packet.fin == 1)
+				{
+					printf("\nRECEIVE FIN!!!\n");
+					sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
+					ack.tcpd_header = ack_addr;
+					ack.packet.finack = 1;
+					ack.packet.ack = 1;
+					ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
+					ack.packet.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+					window_srv[lowest_seq_window_index] = -1;
+					strcpy(ack.packet.data, "FIN");
+					sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
+					printf("\nFINISH TRANSFER FILE\n");
+					close(sock_ack);
+					close(sock_troll);
+					close(sock_ftps);
+					exit(0);
+				}
+			}
+			else
+			{
+				printf("\nSLEEP FOR WAITING\n");
+				usleep(1000000);
+			}//END LOW
+		}
+		else if(crc_match == FALSE)
+		{
+			printf("\nCRC WRONG, RETRANSMIT\n");
+		}
+	}
 
-                        //if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+16+16, 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+16+16)){
-
-                        if((buflen = recvfrom(sock_troll, troll_buf, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in), 0, (struct sockaddr *)&troll_addr, &troll_addr_len)) < (MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in))){
-                                bcopy(troll_buf,&troll_msg, buflen);
-
-                                //bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-16);
-
-                                bcopy(&troll_msg.msg_contents, &tcpd_msg, buflen-sizeof(struct sockaddr_in));
-                               
-                                //if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-16-16, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, buflen-sizeof(struct sockaddr_in)-sizeof(struct sockaddr_in), 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-                                        perror("sending datagram to ftps");
-                                        exit(5);
-                                }
-                                bzero(&tcpd_msg,sizeof(TCPD_MSG));
-
-//                                write(fd,tcpd_msg.tcpd_contents, buflen-16-16);
-                                break;
-
-                        }
-                        else
-                        {
-                                //bcopy(troll_buf,&troll_msg, MAXBUF+16+16);
-
-                                bcopy(troll_buf,&troll_msg, MAXBUF+sizeof(struct sockaddr_in)+sizeof(struct sockaddr_in));
-
-                                //bcopy(&troll_msg.msg_contents, &tcpd_msg, MAXBUF+16);
-                                bcopy(&troll_msg.msg_contents, &tcpd_msg, MAXBUF+sizeof(struct sockaddr_in));
-
-//                                write(fd,tcpd_msg.tcpd_contents, MAXBUF);
-                                if((sendto(sock_ftps, &tcpd_msg.tcpd_contents, MAXBUF, 0, (struct sockaddr *)&ftps_addr, ftps_addr_len)) < 0){
-                                        perror("sending datagram to ftps");
-                                        exit(5);
-                                }
-                                bzero(&tcpd_msg,sizeof(TCPD_MSG));
-                        }
-
-
-                }
-        }
-
-
-        close(sock_troll);
-        close(sock_ftps);
-        exit(0);
-        }
+}
