@@ -74,7 +74,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
         /* create troll_addr with parameters and bind troll_addr to socket */
         troll_m2_addr.sin_family = AF_INET;
-        troll_m2_addr.sin_port = htons(TROLL_PORT_M1);
+        troll_m2_addr.sin_port = htons(TCPD_PORT_M1);
         troll_m2_addr.sin_addr.s_addr = INADDR_ANY;        
 
         if(bind(sock_from_troll_m2, (struct sockaddr *)&troll_m2_addr, sizeof(troll_m2_addr)) < 0) {
