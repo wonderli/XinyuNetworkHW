@@ -143,6 +143,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
         bcopy(filename, read_file_buf+4, 20);
 
 //        SEND(sck,&send_msg,sizeof(TCPD_MSG),0);
+        SEND(sck,&send_msg,sizeof(TCPD_MSG),0);
         int FILE_EOF = FALSE;
         
         FD_ZERO(&read_fds);
