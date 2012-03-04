@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         
         struct timeval time_start, time_end, diff;
         float start, end;
-	float time_remain = 0;
+	float time_rem = 0;
         int resend_pkt;
         int head = 0;
         int tail = 0;
@@ -222,13 +222,13 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 			gettimeofday(&time_start, NULL);
 			timer_send.seq = buffer[index].packet.seq_num;
-			timer_send.time = RTO(time_remain, buffer[index].packet.seq_num);
+			timer_send.time = RTO(time_rem, buffer[index].packet.seq_num);
 			timer_send.action = START;
 			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
 			
 			ptr++;//move window index
 			head = (head + 1) % 64;//wrap buffer
-			if(ptr >= 19)
+			if(ptr > 20)
 			{
 				printf("\nWINDOW FULL, SLEEP\n");
 				control_msg.packet.stop = 1;
@@ -248,7 +248,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 		if(FD_ISSET(sock_ack, &read_fds))
 		{
 			gettimeofday(&time_end, NULL);
-			time_remain = RTT(&time_start, &time_end);
+			time_rem = RTT(&time_start, &time_end);
 
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
 			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
@@ -327,7 +327,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
 
 				gettimeofday(&time_start, NULL);
-				timer_send.time = RTO(time_remain, buffer[resend_pkt].packet.seq_num);
+				timer_send.time = RTO(time_rem, buffer[resend_pkt].packet.seq_num);
 				timer_send.seq = buffer[resend_pkt].packet.seq_num;
 				timer_send.action = START;
 				sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(timer_send_addr));
@@ -335,7 +335,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 		}
 		FD_ZERO(&read_fds);
 		FD_SET(sock_ftpc, &read_fds);
-		FD_SET(sock_timer_send, &read_fds);
+		FD_SET(sock_timer_recv, &read_fds);
 		FD_SET(sock_ack, &read_fds);
         }
 }
