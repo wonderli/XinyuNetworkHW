@@ -108,6 +108,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 		checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
 
+                printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", checksum, recv_buffer[head].checksum);
 		if(checksum == recv_buffer[head].checksum)
 		{
 			crc_match = TRUE;
