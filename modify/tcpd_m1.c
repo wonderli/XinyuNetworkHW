@@ -100,14 +100,14 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	while(1)
 	{
 		recvfrom(sock_from_troll, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
-		checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data), 0);
+		checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));
 		if(checksum == recv_buffer[head].checksum)
 		{
 			crc_match = TRUE;
 			ack_buffer_flag = FALSE;
 			for(i = 0; i< 64; i++)
 			{
-				if(ack_buffer[i] == recv_buffer[head].packetdata.seq_num)
+				if(ack_buffer[i] == recv_buffer[head].packet.seq_num)
 				{
 					ack_buffer_flag = TRUE;
 				}
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					{
 						ptr = 0;
 					}
-					ack.checksum = cal_crc((void*)&ack.packet, sizeof(struct packet));
+					ack.checksum = cal_crc((void*)&ack.packet, sizeof(struct packet_data));
 					ack.tcpd_header = ack_addr; 
 					sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
 					window_srv[lowest_seq_window_index] = -1;
@@ -200,16 +200,16 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					printf("\nRECEIVE FIN!!!\n");
 					sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
 					ack.tcpd_header = ack_addr;
-					ack.packet.finack = 1;
+					ack.packet.fin_ack = 1;
 					ack.packet.ack = 1;
 					ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
-					ack.packet.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+					ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
 					window_srv[lowest_seq_window_index] = -1;
 					strcpy(ack.packet.data, "FIN");
 					sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
 					printf("\nFINISH TRANSFER FILE\n");
 					close(sock_ack);
-					close(sock_troll);
+					close(sock_from_troll);
 					close(sock_ftps);
 					exit(0);
 				}

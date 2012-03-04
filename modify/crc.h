@@ -1,11 +1,12 @@
-unsigned short cal_crc(unsigned char *ptr, unsigned char len)
+//unsigned short cal_crc(unsigned char *ptr, unsigned char len)
+unsigned long cal_crc(unsigned char *ptr, unsigned char len)
 {
 
-        unsigned short crc;
+        unsigned long crc;
 
         unsigned char da;
 
-        unsigned short crc_ta[256] =    /* CRC ??? */
+        unsigned long crc_ta[256] =    /* CRC ??? */
 
         { 
 

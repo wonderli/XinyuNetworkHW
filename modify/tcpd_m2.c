@@ -290,17 +290,17 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				
 				if(recvfrom(sock_timer_recv, &timer_recv, sizeof(timer_recv), 0, (struct sockaddr *)&timer_recv_addr, &timer_recv_addr_len) > 0)
 				{
-					printf("\n PACKET SEQ NUM: %d HAS EXPIRED\n", timer_recv.seq_num);
+					printf("\n PACKET SEQ NUM: %d HAS EXPIRED\n", timer_recv.seq);
 
 				}
 				for(i = 0; i < 20; i++)
 				{
-					if(window[i] == timer_recv.seq_num)
+					if(window[i] == timer_recv.seq)
 					{
 						for(j = 0; j < 64; j++)
 						{
 
-							if((buffer[j].packet.seq_num == timer_recv.seq_num) && (buffer[j].packet.seq_num != -1))
+							if((buffer[j].packet.seq_num == timer_recv.seq) && (buffer[j].packet.seq_num != -1))
 							{
 								printf("\nRESEND TO BUFFER\n");
 								resend_pkt = j;
@@ -311,7 +311,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
 				gettimeofday(&time_start, NULL);
 				timer_send.time = RTO(time_remain, buffer[resend_pkt].packet.seq_num);
-				timer_send.seq_no = buffer[resend_pkt].packet.seq_num;
+				timer_send.seq = buffer[resend_pkt].packet.seq_num;
 				timer_send.action = START;
 				sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(timer_send_addr));
 			}
