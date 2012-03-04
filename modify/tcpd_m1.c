@@ -168,6 +168,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 		if(crc_match == TRUE)
 		{
+                        printf("\nENTER IF CRC_MATCH\n");
 			//find the lowest window seq;
 			for(i = 0; i < 20; i++)
 			{
@@ -188,6 +189,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					}
 				}
 				sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
+                                printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
 
 				if(recv_buffer[buffer_index].packet.fin != 1)
 				{
