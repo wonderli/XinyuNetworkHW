@@ -109,13 +109,12 @@ int main()
                                         ptr = ptr->next;
                                         time_msg_send.seq = expire_node->seq;
                                         time_msg_send.action = EXPIRE;
-
+                                        time_msg_send.time = -1;
                                         if(sendto(sock_timer_send, &time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
                                         {
                                                 perror("\nTIMER SEND ERROR\n");
                                                 exit(1);
                                         }
-
 
                                         remove_node(expire_node);
                                         time_list->len--;
