@@ -103,6 +103,7 @@ int get_file_size(char *filename)
 */
 int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_addr, struct sockaddr_in control_addr)
 {
+        printf("\nBEGIN TO SEND FILE\n");
         int nread;
         int send_file;
         fd_set read_fds;
