@@ -163,6 +163,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
 				//sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
 				sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
+                                printf("\nSEND ACK SEQ %d, TO TROLL M1\n", ack.packet.ack_seq);
 			}
 		}
 
