@@ -175,7 +175,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                 else if (nread == (MAXBUF-24))
                                 {
                                         send_msg.packet.seq_num = 1;
-                                        send_msg.packet.length = nread;
+                                        send_msg.packet.length = nread+24;
                                         bcopy(read_file_buf,send_msg.packet.data,nread+24);
                                         //SEND (sck, (char *)&send_msg, MAXBUF+sizeof(struct sockaddr_in), 0);
                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
@@ -189,7 +189,6 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                                         send_msg.packet.seq_num ++;
                                                         send_msg.packet.length = nread;
                                                         bcopy(read_file_buf,send_msg.packet.data,nread);
-                                                        //SEND (sck, (char *)&send_msg, nread+sizeof(struct sockaddr_in), 0);
                                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
                                                         /*printf("The nread is %d", nread);*/
                                                         bzero(read_file_buf, MAXBUF);
