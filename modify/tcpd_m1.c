@@ -237,7 +237,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			else
 			{
 				printf("\nSLEEP FOR WAITING\n");
-				usleep(1000000);
+				usleep(100000);
 			}//END LOW
 		}
 		else if(crc_match == FALSE)
