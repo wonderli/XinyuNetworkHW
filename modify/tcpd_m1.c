@@ -12,7 +12,7 @@ void print_win()
 {
         printf("\nWINDOW\n");
         int i = 0;
-        for(i = 0; i < 64; i++)
+        for(i = 0; i < 20; i++)
         {
                 printf("%d~", window_srv[i]);
         }
