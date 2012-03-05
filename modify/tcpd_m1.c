@@ -8,7 +8,7 @@ int window_srv[20];
 int ptr = 0;
 int ack_buffer[64];
 TCPD_MSG recv_buffer[64];
-ind find_min()
+int find_min()
 {
         int min=10000;
         int i = 0;
@@ -20,14 +20,14 @@ ind find_min()
                 }
 
         }
-        return min
+        return min;
 }
 int find_min_buffer(int min)
 {
         int i = 0;
         for(i = 0; i < 64; i++)
         {
-                if(ack_buffer[i].packet.seq_num == min)
+                if(recv_buffer[i].packet.seq_num == min)
                 {
                         return i;
                 }
