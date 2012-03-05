@@ -99,6 +99,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	int lastsent = -1;
         fd_set read_fds;
 	
+        int new_buf_size = SOCK_BUFF_SIZE;
 	//init window
 	for(i = 0; i < 20; i++)
 	{
@@ -132,6 +133,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(2);
         }
 
+        setsockopt(sock_from_troll_m2, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 	if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		perror("opening datagram socket for send ack to tcpd_m2");
 		exit(1);

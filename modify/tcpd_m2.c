@@ -86,6 +86,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	int i = 0;
 	int j = 0;
 
+        int new_buf_size = SOCK_BUFF_SIZE;
 
 
 
@@ -102,6 +103,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 perror("Recv(receive from ftpc) socket Bind failed");
                 exit(2);
         }
+        setsockopt(sock_ftpc, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 
         /*create control socket*/
         if((sock_control = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -125,6 +127,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(2);
         }
 
+        setsockopt(sock_ack, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 
         if((sock_timer_send = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
                 perror("opening datagram socket for recv from timer send");
@@ -146,6 +149,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 perror("timer recv socket Bind failed");
                 exit(2);
         }
+        setsockopt(sock_timer_recv, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 
         /*create troll socket*/
         if((sock_troll = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {

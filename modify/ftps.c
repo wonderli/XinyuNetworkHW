@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
 		perror("error binding stream socket");
 		exit(1);
 	}
+        int new_buf_size = SOCK_BUFF_SIZE;
+        setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 
         /* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);

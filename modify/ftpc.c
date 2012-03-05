@@ -72,6 +72,8 @@ int main(int argc, char *argv[])
 		perror("error binding stream socket");
 		exit(1);
 	}
+        int new_buf_size = SOCK_BUFF_SIZE;
+        setsockopt(sock_control, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 
 	file_send(sock,sock_control, filename,sin_addr, control_addr);  
 
