@@ -260,7 +260,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 			if(ack_msg.checksum == recv_checksum)
 			{
-				if(ack_msg.packet.ack = 1)
+				if(ack_msg.packet.ack == 1)
 				{
 
 					//Delete this seq from Timer
