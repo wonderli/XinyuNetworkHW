@@ -163,7 +163,6 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                         RECV_CONTROL(control_sck, &recv_msg, sizeof(TCPD_MSG), 0);
                         if(recv_msg.packet.stop == 1)
                         {
-                                send_msg.packet.seq_num--;
                                 printf("\nreceive stop signal, stop sending msg\n");
                                 usleep(10000);
                         }
@@ -196,7 +195,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                         bzero(send_msg.packet.data, MAXBUF);
                                         send_msg.packet.fin = 1;
                                         send_msg.packet.length = 0;
-//                                        send_msg.packet.seq_num++;
+                                        send_msg.packet.seq_num++;
                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
                                         close(send_file);
                                         close(sck);

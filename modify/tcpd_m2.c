@@ -15,6 +15,19 @@ int locate_in_buffer(int seq_num)
         }
         return i;
 }
+void print_win()
+{
+        printf("\nWINDOW\n");
+        int i = 0;
+        for(i = 0; i < 20; i++)
+        {
+                printf("%d~", window[i]);
+        }
+}
+
+
+
+
 int window_empty()
 {
 	int empty_flag = 0;
@@ -215,6 +228,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 {
                         buflen = recvfrom(sock_ftpc, (void *)&buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len);
                         printf("\nRECVFROM FTPC: SEQ: %d\n", buffer[head].packet.seq_num);
+                        print_win();
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
