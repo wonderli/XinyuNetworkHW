@@ -115,6 +115,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	ftps_addr.sin_port = htons(TCPD_PORT);
 	ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
 
+       // recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
         FD_ZERO(&read_fds);
         FD_SET(sock_from_troll_m2, &read_fds);
 
