@@ -229,7 +229,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 }
                                 sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
                                 printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
-                                printf("\nSEND CONTENT:%s to ftps\n", recv_buffer[buffer_index].packet.data);
+                                printf("\nSEND CONTENT:%d to ftps\n", recv_buffer[buffer_index].packet.length);
 
                                 if(recv_buffer[buffer_index].packet.fin != 1)
                                 {
