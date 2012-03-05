@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                                 ack_buffer_flag = TRUE;
                                         }
                                 }
-                                printf("\nACK_BUFFER_FLAG STATUS %d\n", ack_buffer_flag);
+                                //printf("\nACK_BUFFER_FLAG STATUS %d\n", ack_buffer_flag);
 
                                 if(ack_buffer_flag != TRUE)//NOT IN BUFFER
                                 {
@@ -209,7 +209,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         }
                                         else if(ack_exist == FALSE)//NOT IN WINDOW
                                         {
-                                                window_index = recv_buffer[head].packet.seq_num % 20;
+                                                //window_index = recv_buffer[head].packet.seq_num % 20;
+                                                window_index = recv_buffer[head].packet.seq_num;
                                                 window_srv[window_index] = recv_buffer[head].packet.seq_num;
 
                                                 if(head < 63)
