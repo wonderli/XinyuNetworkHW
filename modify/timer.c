@@ -137,10 +137,10 @@ int main()
                         }
                 }
                         /* Print deltalist */
-                        if(time_list->head != NULL)
-                        {
-                                print_list(time_list);
-                        }
+//                        if(time_list->head != NULL)
+//                        {
+//                                print_list(time_list);
+//                        }
         }
         close(sock_timer_recv);
         close(sock_timer_send);
