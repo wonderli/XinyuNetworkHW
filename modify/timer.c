@@ -78,13 +78,19 @@ int main()
                         {
                                 printf("cancel node\n");
                                 cancel_node(time_list, time_msg_recv.seq);
-                                print_list(time_list);
+                                if(time_list->head != NULL)
+                                {
+                                        print_list(time_list);
+                                }
                         }else if(time_msg_recv.action == START) /* Add node for timing */
                         {
                                 printf("start node\n");
                                 node *new_node = creat_node(time_msg_recv.seq, time_msg_recv.time);
                                 insert_node(time_list, new_node);
-                                print_list(time_list);
+                                if(time_list->head != NULL)
+                                {
+                                        print_list(time_list);
+                                }
                         }
                         time_set_flag = 1;
                         continue;
