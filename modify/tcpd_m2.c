@@ -264,9 +264,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				{
 
 					//Delete this seq from Timer
-					timer_send.seq = ack_msg.packet.seq_num;
+					timer_send.seq = ack_msg.packet.ack_seq;
 					timer_send.action = CANCEL;
 					timer_send.time = 0;//Don't know whether this will work or not
+                                        printf("\nCANCEL TIMER\n");
 					sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
 
 					for(i = 0; i < 20; i++)
@@ -279,6 +280,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 					if(window_empty())
 					{
+                                                printf("\nWINDOW EMPTY\n");
 						control_msg.packet.stop = 0;//WINDOW EMPTY, KEEP SENDING
 						ptr = 0;//Make pointer back to begin
 						sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
