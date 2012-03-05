@@ -226,6 +226,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 }
                 if(FD_ISSET(sock_ftpc, &read_fds))
                 {
+                        printf("\nHEAD IS %d\n", head);
                         buflen = recvfrom(sock_ftpc, (void *)&buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len);
                         printf("\nRECVFROM FTPC: SEQ: %d\n", buffer[head].packet.seq_num);
                         print_win();
