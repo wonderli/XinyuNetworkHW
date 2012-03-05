@@ -21,7 +21,7 @@ int window_empty()
 	int  i = 0;
 	for(i = 0; i < 20; i++)
 	{
-		if(window[i] != 0)
+		if(window[i] != -1)
 			empty_flag++;
 	}
 	if(empty_flag == 0)
@@ -235,6 +235,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			timer_send.seq = buffer[index].packet.seq_num;
 			timer_send.time = RTO(time_rem, buffer[index].packet.seq_num);
 			timer_send.action = START;
+                        printf("\nSEND SEQ: %d to TIMER\n", timer_send.seq);
 			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
 			
 			ptr++;//move window index
