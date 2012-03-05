@@ -8,6 +8,15 @@ int window_srv[20];
 int ptr = 0;
 int ack_buffer[64];
 TCPD_MSG recv_buffer[64];
+void print_win()
+{
+        printf("\nWINDOW\n");
+        int i = 0;
+        for(i = 0; i < 64; i++)
+        {
+                printf("%d->", window_srv[i]);
+        }
+}
 int main(int argc, char* argv[]) /* server program called with no argument */
 {
         int sock_ftps, ftps_addr_len;
@@ -154,7 +163,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
                                         if(ack_exist == TRUE)
                                         {
-                                                printf("\nIN THE WINDOWS, WILL ARRIVE\n",recv_buffer[head].packet.seq_num);
+                                                printf("\nIN THE WINDOWS, WILL ARRIVE FTPS SOON\n",recv_buffer[head].packet.seq_num);
                                         }
                                         else if(ack_exist == FALSE)//NOT IN WINDOW
                                         {
@@ -203,6 +212,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         }
                         printf("\nLOWEST_SEQ %d\n", lowest_seq);
                         printf("\nLASTSENT+1: %d\n", lastsent+1);
+                        print_window();
                         if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
                         {
                                 int buffer_index = 0;
@@ -243,6 +253,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 {
                                         printf("\nRECEIVE FIN!!!\n");
                                         sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
+                                        //sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
                                         ack.tcpd_header = ack_addr;
                                         ack.packet.fin_ack = 1;
                                         ack.packet.ack = 0;
@@ -275,3 +286,4 @@ int main(int argc, char* argv[]) /* server program called with no argument */
       }
 
 }
+

@@ -91,7 +91,7 @@ int main()
                 }
                 time_set_flag = 0;
                 timeout.tv_sec = 0;
-                timeout.tv_usec = 1*1e5;
+                timeout.tv_usec = 1*1e3;
                 if(time_list->len > 0)
                 {
                         gettimeofday(&tv2, &tz);
