@@ -212,7 +212,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         }
                         printf("\nLOWEST_SEQ %d\n", lowest_seq);
                         printf("\nLASTSENT+1: %d\n", lastsent+1);
-                        print_window();
+                        print_win();
                         if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
                         {
                                 int buffer_index = 0;
