@@ -82,21 +82,24 @@ int main(int argc, char *argv[])
 		exit(1);
 	} 
 	/*printf("Server receives: %s\n", buf);*/
-	char *filename;
-	char *filepath;
-	uint32_t file_size = 0;
-	uint32_t file_size_local = 0;
-	filename = (char*)malloc(20);
-	filepath = (char*)malloc(MAXBUF);
-	//bcopy(buf, &file_size, sizeof(int));
-	bcopy(recv_msg.packet.data, &file_size, sizeof(int));
-	file_size_local = ntohl(file_size);
-	//bcopy(buf+4, filename, 20);
-	bcopy(recv_msg.packet.data+4, filename, 20);
-	strcpy(filepath, "./recv/");
-	strcat(filepath, filename);
-	printf("The file length is %d\n", file_size_local);
-	printf("The file name is %s\n", filepath);
+        if(recv_msg.packet.seq_num == 0)
+        {
+                char *filename;
+                char *filepath;
+                uint32_t file_size = 0;
+                uint32_t file_size_local = 0;
+                filename = (char*)malloc(20);
+                filepath = (char*)malloc(MAXBUF);
+                //bcopy(buf, &file_size, sizeof(int));
+                bcopy(recv_msg.packet.data, &file_size, sizeof(int));
+                file_size_local = ntohl(file_size);
+                //bcopy(buf+4, filename, 20);
+                bcopy(recv_msg.packet.data+4, filename, 20);
+                strcpy(filepath, "./recv/");
+                strcat(filepath, filename);
+                printf("The file length is %d\n", file_size_local);
+                printf("The file name is %s\n", filepath);
+        }
 	/*Create the receive file folder and file*/
 	int fd = 0;
 	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
