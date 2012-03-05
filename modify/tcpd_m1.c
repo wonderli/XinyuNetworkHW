@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
         int buflen = 0;
 	int head = 0;
-	int tail = 0;
+//	int tail = 0;
 	
         struct sockaddr_in ftps_addr;
         struct sockaddr_in troll_m2_addr;
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         if(checksum == recv_buffer[head].checksum)
                         {
                                 crc_match = TRUE;
-                                ack_buffer_flag = FALSE;
+                                ack_buffer_flag = FALSE;//CHECK FOR DUP
 
                                 for(i = 0; i< 64; i++)
                                 {
@@ -133,6 +133,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                                 ack_buffer_flag = TRUE;
                                         }
                                 }
+                                printf("\nACK_BUFFER_FLAG STATUS %d\n", ack_buffer_flag);
 
                                 if(ack_buffer_flag != TRUE)//NOT IN BUFFER
                                 {
@@ -169,6 +170,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 }//end if ack_flag
                                 else if(ack_buffer_flag == TRUE)
                                 {
+                                        printf("\nACK FOR DUPLICATE AGAIN\n");
                                         ack.packet.ack = 1;
                                         ack.packet.ack_seq = recv_buffer[head].packet.seq_num;
                                         ack.tcpd_header = ack_addr;
@@ -177,7 +179,11 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
                                         printf("\nSEND ACK SEQ %d, TO TROLL M1\n", ack.packet.ack_seq);
                                 }
-        }
+                }
+                else
+                {
+                        crc_match = FALSE;//checksum wrong
+                }
 
                 if(crc_match == TRUE)
                 {
@@ -194,7 +200,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
                         {
                                 int buffer_index = 0;
-                                for(i = tail; i < 64; i++)
+                                for(i = 0; i < 64; i++)
                                 {
                                         if(recv_buffer[i].packet.seq_num == lowest_seq)
                                         {
@@ -245,7 +251,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         close(sock_ftps);
                                         exit(0);
                                 }
-                        }
+                        }//END IF LAST SENT
                         else
                         {
                                 printf("\nSLEEP FOR WAITING\n");
