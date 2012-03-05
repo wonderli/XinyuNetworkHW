@@ -55,10 +55,10 @@ int main(int argc, char *argv[])
         }
 
 	/* bind socket name to socket */
-	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
-		perror("error binding stream socket");
-		exit(1);
-	}
+//	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
+//		perror("error binding stream socket");
+//		exit(1);
+//	}
 
         /* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);

@@ -106,14 +106,15 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	ack_addr.sin_port = htons(TCPD_PORT_M2);
 	bcopy(hp->h_addr, (void*)&ack_addr.sin_addr, hp->h_length);
 
+        ftps_addr.sin_family = AF_INET;
+	ftps_addr.sin_port = htons(TCPD_PORT);
+	ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
+
         //GET LEN FOR RECVFROM
 	ftps_addr_len=sizeof(struct sockaddr_in);
 	from_troll_addr_len=sizeof(struct sockaddr_in);
 	ack_addr_len  = sizeof(struct sockaddr_in);
         
-        ftps_addr.sin_family = AF_INET;
-	ftps_addr.sin_port = htons(TCPD_PORT);
-	ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
 
        // recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
         FD_ZERO(&read_fds);
