@@ -197,6 +197,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         lowest_seq_window_index = i;
                                 }
                         }
+                        printf("\nLOWEST_SEQ %d\n", lowest_seq);
                         if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
                         {
                                 int buffer_index = 0;
@@ -215,6 +216,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         ack.packet.ack = 1;
                                         ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
                                         lastsent = recv_buffer[buffer_index].packet.seq_num;
+                                        printf("\nLAST SENT: %d\n", lastsent);
                                         ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
 
                                         if(ptr < 63)
