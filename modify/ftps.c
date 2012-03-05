@@ -78,11 +78,19 @@ int main(int argc, char *argv[])
 //        test_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 //        int test_addr_length = sizeof(struct sockaddr);
 
-	for(;;)
-	{
-		bzero(recv_msg.packet.data, MAXBUF);
+        int nread = 0; /* the number read from socket*/
+        char *filename;
+        char *filepath;
+        uint32_t file_size = 0;
+        uint32_t file_size_local = 0;
+        int fd = 0;
+        mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
-		RECV(sock, &recv_msg, sizeof(TCPD_MSG), 0);
+        for(;;)
+        {
+                bzero(recv_msg.packet.data, MAXBUF);
+
+                RECV(sock, &recv_msg, sizeof(TCPD_MSG), 0);
                 if(recv_msg.packet.seq_num == 0)
                 {
 
@@ -90,16 +98,11 @@ int main(int argc, char *argv[])
                         /* put all zeros in buffer (clear) */
                         bzero(buf,MAXBUF);
                         /* read from msgsock and place in buf */
-                        int nread = 0; /* the number read from socket*/
                         if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
                                 perror("error reading on stream socket");
                                 exit(1);
                         } 
                         printf("Server receives: %s\n", recv_msg.packet.data);
-                        char *filename;
-                        char *filepath;
-                        uint32_t file_size = 0;
-                        uint32_t file_size_local = 0;
                         filename = (char*)malloc(20);
                         filepath = (char*)malloc(MAXBUF);
                         //bcopy(buf, &file_size, sizeof(int));
@@ -112,8 +115,6 @@ int main(int argc, char *argv[])
                         printf("The file length is %d\n", file_size_local);
                         printf("The file name is %s\n", filepath);
                         /*Create the receive file folder and file*/
-                        int fd = 0;
-                        mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
                         if(access("recv",F_OK) == -1)
                         {
                                 mkdir("recv",S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
@@ -125,15 +126,15 @@ int main(int argc, char *argv[])
                         }
 
                 }
-		if(recv_msg.packet.fin == 1)
-		{
-			printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size_local);
-			close(fd);
-			close(sock);
-			exit(0);
+                if(recv_msg.packet.fin == 1)
+                {
+                        printf("\nFile: %s, length: %d has been transmitted!\n", filename, file_size_local);
+                        close(fd);
+                        close(sock);
+                        exit(0);
 
-		}
-			write(fd, recv_msg.packet.data, sizeof(recv_msg.packet.data));
+                }
+                write(fd, recv_msg.packet.data, sizeof(recv_msg.packet.data));
 
 	}
 	
