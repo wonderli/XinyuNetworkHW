@@ -60,46 +60,30 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	/* listen for socket connection and set max opened socket connetions to 5 */
-	/*listen(sock, 5);
-        */
-
-	/* accept a (1) connection in socket msgsocket */ 
-        /*
-	if((msgsock = accept(sock, (struct sockaddr *)NULL, (int *)NULL)) == -1) { 
-		perror("error connecting stream socket");
-		exit(1);
-	} 
-        */
-	/* put all zeros in buffer (clear) */
+        /* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);
 	/* read from msgsock and place in buf */
 	int nread = 0; /* the number read from socket*/
-	/*if((nread = read(msgsock, buf, MAXBUF)) < 0) { */ 
-	//if((nread = RECV(sock, buf, MAXBUF,0)) < 0) {
 	if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
 	} 
-	/*printf("Server receives: %s\n", buf);*/
-        if(recv_msg.packet.seq_num == 0)
-        {
-                char *filename;
-                char *filepath;
-                uint32_t file_size = 0;
-                uint32_t file_size_local = 0;
-                filename = (char*)malloc(20);
-                filepath = (char*)malloc(MAXBUF);
-                //bcopy(buf, &file_size, sizeof(int));
-                bcopy(recv_msg.packet.data, &file_size, sizeof(int));
-                file_size_local = ntohl(file_size);
-                //bcopy(buf+4, filename, 20);
-                bcopy(recv_msg.packet.data+4, filename, 20);
-                strcpy(filepath, "./recv/");
-                strcat(filepath, filename);
-                printf("The file length is %d\n", file_size_local);
-                printf("The file name is %s\n", filepath);
-        }
+	printf("Server receives: %s\n", recv_msg.packet.data);
+        char *filename;
+        char *filepath;
+        uint32_t file_size = 0;
+        uint32_t file_size_local = 0;
+        filename = (char*)malloc(20);
+        filepath = (char*)malloc(MAXBUF);
+        //bcopy(buf, &file_size, sizeof(int));
+        bcopy(recv_msg.packet.data, &file_size, sizeof(int));
+        file_size_local = ntohl(file_size);
+        //bcopy(buf+4, filename, 20);
+        bcopy(recv_msg.packet.data+4, filename, 20);
+        strcpy(filepath, "./recv/");
+        strcat(filepath, filename);
+        printf("The file length is %d\n", file_size_local);
+        printf("The file name is %s\n", filepath);
 	/*Create the receive file folder and file*/
 	int fd = 0;
 	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
