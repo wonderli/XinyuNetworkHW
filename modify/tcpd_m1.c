@@ -202,6 +202,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 {
                         printf("\nENTER IF CRC_MATCH\n");
                         //find the lowest window seq;
+                        lowest_seq = 100000;
                         for(i = 0; i < 20; i++)
                         {
                                 if(window_srv[i] < lowest_seq && window_srv[i] != -1)
