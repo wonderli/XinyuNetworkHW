@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 	int lowest_seq = 100000; 
 	int lowest_seq_window_index = 0;
-	int lastsent;
+	int lastsent = -1;
         fd_set read_fds;
 	
 	//init window
