@@ -224,6 +224,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         if(recv_buffer[i].packet.seq_num == lowest_seq)
                                         {
                                                 buffer_index = i;
+                                                break;
                                         }
                                 }
                                 sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));

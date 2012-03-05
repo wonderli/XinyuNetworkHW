@@ -65,11 +65,11 @@ int main(int argc, char *argv[])
 	/* read from msgsock and place in buf */
 	int nread = 0; /* the number read from socket*/
         bzero(&recv_msg, sizeof(TCPD_MSG));
-//	if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
-//		perror("error reading on stream socket");
-//		exit(1);
-//	} 
-	nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0);
+	if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
+		perror("error reading on stream socket");
+		exit(1);
+	} 
+//	nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0);
         printf("\nWHY?\n");
 	printf("\nServer receives: %s\n", recv_msg.packet.data);
         char *filename;
