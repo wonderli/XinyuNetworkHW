@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 	/* read from msgsock and place in buf */
         printf("\nBEGIN TO RECV\n");
 	int nread = 0; /* the number read from socket*/
-        bzero(recv_msg, sizeof(TCPD_MSG));
+        bzero(&recv_msg, sizeof(TCPD_MSG));
 	if((nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0)) < 0) {
 		perror("error reading on stream socket");
 		exit(1);
