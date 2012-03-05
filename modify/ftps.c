@@ -70,8 +70,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	} 
 //	nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0);
-        printf("\nWHY?\n");
-	printf("\nServer receives: %s\n", recv_msg.packet.data);
+	printf("\nServer receives: SEQ %d\n", recv_msg.packet.seq_num);
         char *filename;
         char *filepath;
         uint32_t file_size = 0;

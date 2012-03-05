@@ -52,10 +52,11 @@ int main()
         int time_set_flag = 0;
         int len = sizeof(timer_recv_addr);
         int MAXFD = sock_timer_recv + 1;
+        FD_ZERO(&fd_read_set);
+        FD_SET(sock_timer_recv, &fd_read_set);
+
         while(1)
         { 
-                FD_ZERO(&fd_read_set);
-                FD_SET(sock_timer_recv, &fd_read_set);
 
                 if(time_set_flag == 0)
                 {
@@ -78,19 +79,13 @@ int main()
                         {
                                 printf("cancel node\n");
                                 cancel_node(time_list, time_msg_recv.seq);
-                                if(time_list->head != NULL)
-                                {
-                                        print_list(time_list);
-                                }
+                                print_list(time_list);
                         }else if(time_msg_recv.action == START) /* Add node for timing */
                         {
                                 printf("start node\n");
                                 node *new_node = creat_node(time_msg_recv.seq, time_msg_recv.time);
                                 insert_node(time_list, new_node);
-                                if(time_list->head != NULL)
-                                {
-                                        print_list(time_list);
-                                }
+                                print_list(time_list);
                         }
                         time_set_flag = 1;
                         continue;
@@ -101,9 +96,9 @@ int main()
                 if(time_list->len > 0)
                 {
                         gettimeofday(&tv2, &tz);
-                        usleep(200*1e3 - (tv2.tv_usec - tv1.tv_usec));
+                        usleep(1e6 - (tv2.tv_usec - tv1.tv_usec));
                         /* Update data*/
-                        time_list->head->time = time_list->head->time - (200*1e3 - (tv2.tv_usec - tv1.tv_usec));                        
+                        time_list->head->time = time_list->head->time - (1e6 - (tv2.tv_usec - tv1.tv_usec));                        
                         if(expire(time_list) == TRUE)
                         {
                                 gettimeofday(&tv2, &tz);
@@ -117,11 +112,11 @@ int main()
                                         time_msg_send.action = EXPIRE;
                                         time_msg_send.time = 0;
                                         printf("\nBEGIN REMOVE NODE\n");
-                                        //if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
-                                        //{
-                                        //        perror("\nTIMER SEND ERROR\n");
-                                        //        exit(1);
-                                        //}
+                                        if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
+                                        {
+                                                perror("\nTIMER SEND ERROR\n");
+                                                exit(1);
+                                        }
                                         printf("\nREMOVE NODE\n");
 
                                         remove_node(expire_node);
@@ -134,6 +129,7 @@ int main()
                                 }
 
 				
+                                print_list(time_list);
                         }
                 }
                         /* Print deltalist */
@@ -141,6 +137,9 @@ int main()
 //                        {
 //                                print_list(time_list);
 //                        }
+                FD_ZERO(&fd_read_set);
+                FD_SET(sock_timer_recv, &fd_read_set);
+
         }
         close(sock_timer_recv);
         close(sock_timer_send);
