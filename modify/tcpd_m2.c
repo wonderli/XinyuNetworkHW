@@ -288,7 +288,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						}
 					}
 
-					if(window_empty())
+					if(window_empty() == TRUE)
 					{
                                                 printf("\nWINDOW EMPTY\n");
 						control_msg.packet.stop = 0;//WINDOW EMPTY, KEEP SENDING
