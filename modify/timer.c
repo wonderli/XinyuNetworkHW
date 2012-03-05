@@ -16,6 +16,7 @@ int main()
         TIME_MSG time_msg_send;
         struct sockaddr_in timer_recv_addr;
         struct sockaddr_in timer_send_addr;
+        int new_buf_size = SOCK_BUFF_SIZE;
 //        struct sockaddr_in timer_addr;
         linklist *time_list;
         if((sock_timer_recv = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
@@ -34,6 +35,7 @@ int main()
                 perror("Timer send to tcpd socket Bind failed");
                 exit(0);
         }
+        setsockopt(sock_timer_recv, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
 
 	if((sock_timer_send = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
         {
