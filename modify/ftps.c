@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
 	sin_addr.sin_family = AF_INET;
 	sin_addr.sin_addr.s_addr = INADDR_ANY;
 	/*sin_addr.sin_port = htons(atoi(port));*/
-	sin_addr.sin_port = htons(atoi(argv[1]));
+	//sin_addr.sin_port = htons(atoi(argv[1]));
+	sin_addr.sin_port = htons(TCPD_PORT);
 	int opt=1;
 
         if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(int)) == -1) {
@@ -55,10 +56,10 @@ int main(int argc, char *argv[])
         }
 
 	/* bind socket name to socket */
-//	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
-//		perror("error binding stream socket");
-//		exit(1);
-//	}
+	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
+		perror("error binding stream socket");
+		exit(1);
+	}
 
         /* put all zeros in buffer (clear) */
 	bzero(buf,MAXBUF);
