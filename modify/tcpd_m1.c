@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         troll_m2_addr.sin_addr.s_addr = INADDR_ANY;        
 
         if(bind(sock_from_troll_m2, (struct sockaddr *)&troll_m2_addr, sizeof(troll_m2_addr)) < 0) {
-                perror("Recv(receive from troll) socket Bind failed");
+                perror("Recv(receive from troll socket Bind failed");
                 exit(2);
         }
 
@@ -229,6 +229,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 }
                                 sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
                                 printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
+                                printf("\nSEND CONTENT:%s to ftps\n", recv_buffer[buffer_index].packet.data);
 
                                 if(recv_buffer[buffer_index].packet.fin != 1)
                                 {
