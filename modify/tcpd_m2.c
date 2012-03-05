@@ -186,6 +186,14 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //               perror("error on write file");
 //               exit(1);
 //       }
+        for(i = 0; i < 64; i++)
+        {
+                buffer[i].packet.seq_num = -1;
+        }
+        for(i = 0; i < 20; i++)
+        {
+                window[i]=-1;
+        }
 
         
 
@@ -257,6 +265,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
 			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
                         printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", recv_checksum, ack_msg.checksum);
+                        printf("\nACK SEQ: %d\n", ack_msg.packet.ack_seq);
 
 			if(ack_msg.checksum == recv_checksum)
 			{
@@ -274,7 +283,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					{
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
-							window[i] = 0;//RECV ACK
+							window[i] = -1;//RECV ACK
 						}
 					}
 

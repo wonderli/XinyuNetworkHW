@@ -115,6 +115,7 @@ int main()
                                                 perror("\nTIMER SEND ERROR\n");
                                                 exit(1);
                                         }
+                                        printf("\nREMOVE NODE\n");
 
                                         remove_node(expire_node);
                                         time_list->len--;
