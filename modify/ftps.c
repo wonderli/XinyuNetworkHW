@@ -69,6 +69,7 @@ int main(int argc, char *argv[])
 		perror("error reading on stream socket");
 		exit(1);
 	} 
+        printf("\nNREAD: %d\n", nread);
 //	nread = RECV(sock, &recv_msg, sizeof(TCPD_MSG),0);
 	printf("\nServer receives: SEQ %d\n", recv_msg.packet.seq_num);
         char *filename;

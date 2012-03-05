@@ -15,7 +15,6 @@ int RECV(int socket, void *buffer, size_t len, int flags) {
 	srv_addr.sin_family = AF_INET;
 	srv_addr.sin_port = htons(TCPD_PORT);
 	srv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-        printf("\nIN TCPD RECV\n");
 	int srv_addr_length = sizeof(struct sockaddr_in);
         int ret;
 	if((ret = recvfrom(socket, buffer, len, flags, (struct sockaddr *)&srv_addr, &srv_addr_length))< 0){
