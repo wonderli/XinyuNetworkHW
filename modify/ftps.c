@@ -47,7 +47,9 @@ int main(int argc, char *argv[])
 	sin_addr.sin_addr.s_addr = INADDR_ANY;
 	/*sin_addr.sin_port = htons(atoi(port));*/
 	//sin_addr.sin_port = htons(atoi(argv[1]));
-	sin_addr.sin_port = htons(TCPD_PORT);
+	//sin_addr.sin_port = htons(TCPD_PORT);
+	sin_addr.sin_port = htons(TCPD_PORT_FTPS);
+
 	int opt=1;
 
         if (setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(int)) == -1) {

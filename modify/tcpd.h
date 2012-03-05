@@ -12,19 +12,7 @@
 #include <string.h>
 #include <errno.h>
 #endif
-#define TCPD_PORT 3850
-#define TCPD_PORT_M1 3860
-#define TCPD_PORT_M2 3870
-#define TROLL_PORT_M1 3880
-#define TROLL_PORT_M2 3890
-//#define CONTROL_PORT_M1 4100
-#define CONTROL_PORT 4100
-//#define CONTROL_PORT_M2 4200
-#define TIMER_SEND_PORT 4300
-#define TIMER_RECV_PORT 4400
-#define MAXBUF 1000
-#define TRUE 1
-#define FALSE 0
+#include "port.h"
 typedef struct packet_data {
         int seq_num;
         int ack;

@@ -13,28 +13,29 @@
 #include <string.h>
 #include <errno.h>
 #endif
-#ifndef TCPD_PORT
-#define TCPD_PORT 3850
-#endif
-#ifndef TCPD_PORT_M1
-#define TCPD_PORT_M1 3860
-#endif
-#ifndef TCPD_PORT_M2
-#define TCPD_PORT_M2 3870
-#endif
-#ifndef TROLL_PORT_M1
-#define TROLL_PORT_M1 3880
-#endif
-#ifndef TROLL_PORT_M2
-#define TROLL_PORT_M2 3890
-#endif
-//#define TIMER_PORT 3990
-#ifndef TIMER_SEND_PORT
-#define TIMER_SEND_PORT 4300
-#endif
-#ifndef TIMER_RECV_PORT
-#define TIMER_RECV_PORT 4400
-#endif
+//#ifndef TCPD_PORT
+//#define TCPD_PORT 3850
+//#endif
+//#ifndef TCPD_PORT_M1
+//#define TCPD_PORT_M1 3860
+//#endif
+//#ifndef TCPD_PORT_M2
+//#define TCPD_PORT_M2 3870
+//#endif
+//#ifndef TROLL_PORT_M1
+//#define TROLL_PORT_M1 3880
+//#endif
+//#ifndef TROLL_PORT_M2
+//#define TROLL_PORT_M2 3890
+//#endif
+////#define TIMER_PORT 3990
+//#ifndef TIMER_SEND_PORT
+//#define TIMER_SEND_PORT 4300
+//#endif
+//#ifndef TIMER_RECV_PORT
+//#define TIMER_RECV_PORT 4400
+//#endif
+#include "port.h"
 #define MAXBUF 1000
 #define TRUE 1
 #define FALSE 0
