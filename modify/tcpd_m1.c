@@ -274,11 +274,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
                                 printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
 
+                                lastsent = recv_buffer[buffer_index].packet.seq_num;
                                 if(recv_buffer[buffer_index].packet.fin != 1)
                                 {
                                         ack.packet.ack = 1;
                                         ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
-                                        lastsent = recv_buffer[buffer_index].packet.seq_num;
+                                        //lastsent = recv_buffer[buffer_index].packet.seq_num;
                                         printf("\nLAST SENT: %d\n", lastsent);
                                         ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
 
@@ -294,8 +295,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         ack.checksum = cal_crc((void*)&ack.packet, sizeof(struct packet_data));
 					printf("\nACK CHECKSUM %d\n", ack.checksum);
                                         ack.tcpd_header = ack_addr; 
-                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
-                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
+                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
+                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
                                         window_srv[lowest_seq_window_index] = -1;
                                 }//end if fin != 1
                                 else if(recv_buffer[buffer_index].packet.fin == 1)
