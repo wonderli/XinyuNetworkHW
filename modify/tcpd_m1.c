@@ -102,6 +102,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	from_troll_addr_len=sizeof(struct sockaddr_in);
 	ack_addr_len  = sizeof(struct sockaddr_in);
         
+        ftps_addr.sin_family = AF_INET;
+	ftps_addr.sin_port = htons(TCPD_PORT);
+	ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
+
         FD_ZERO(&read_fds);
         FD_SET(sock_from_troll_m2, &read_fds);
 
