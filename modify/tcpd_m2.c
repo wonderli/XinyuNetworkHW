@@ -295,6 +295,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						timer_send.seq = ack_msg.packet.ack_seq;
 						timer_send.action = CANCEL;
 						timer_send.time = 0;
+                                                printf("\n CANCEL NODE SEQ: %d\n", timer_send.seq);
 						sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
 						close(sock_troll);
 						close(sock_ftpc);
