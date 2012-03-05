@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 #endif
 #define TCPD_PORT 3850
 #define TCPD_PORT_M1 3860

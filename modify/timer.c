@@ -31,13 +31,13 @@ int main()
 
         if(bind(sock_timer_recv, (struct sockaddr *)&timer_recv_addr, sizeof(timer_recv_addr)) < 0)
         {
-                perror("RECV(receive from tcpd_m2) socket Bind failed");
+                perror("Timer send to tcpd socket Bind failed");
                 exit(0);
         }
 
 	if((sock_timer_send = socket(AF_INET, SOCK_DGRAM, 0)) < 0) 
         {
-                perror("opening datagram socket for recv from tcpd_m1");
+                perror("sock_timer_send sock failed )");
         }
         timer_send_addr.sin_family = AF_INET;
         timer_send_addr.sin_port = htons(TIMER_RECV_PORT);
@@ -113,12 +113,14 @@ int main()
                                         time_msg_send.action = EXPIRE;
                                         time_msg_send.time = 0;
                                         printf("\nBEGIN REMOVE NODE\n");
+                                        again:
                                         if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
                                         {
                                                 perror("\nTIMER SEND ERROR\n");
                                                 exit(1);
                                         }
                                         printf("\nREMOVE NODE\n");
+                                        if(errno == EINTR) goto again;
 
                                         remove_node(expire_node);
                                         time_list->len--;

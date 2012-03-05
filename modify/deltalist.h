@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <errno.h>
 #endif
 #ifndef TCPD_PORT
 #define TCPD_PORT 3850
