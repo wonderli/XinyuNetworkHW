@@ -70,7 +70,8 @@ int main(int argc, char *argv[])
 		perror("error reading on stream socket");
 		exit(1);
 	} 
-	printf("Server receives: %s\n", recv_msg.packet.data);
+        printf("\nWHY?\n");
+	printf("\nServer receives: %s\n", recv_msg.packet.data);
         char *filename;
         char *filepath;
         uint32_t file_size = 0;
