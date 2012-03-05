@@ -89,10 +89,10 @@ int main(int argc, char *argv[])
 	filename = (char*)malloc(20);
 	filepath = (char*)malloc(MAXBUF);
 	//bcopy(buf, &file_size, sizeof(int));
-	bcopy(&recv_msg.packet.data, &file_size, sizeof(int));
+	bcopy(recv_msg.packet.data, &file_size, sizeof(int));
 	file_size_local = ntohl(file_size);
 	//bcopy(buf+4, filename, 20);
-	bcopy(&recv_msg.packet.data+4, filename, 20);
+	bcopy(recv_msg.packet.data+4, filename, 20);
 	strcpy(filepath, "./recv/");
 	strcat(filepath, filename);
 	printf("The file length is %d\n", file_size_local);
