@@ -92,13 +92,14 @@ int main()
                 }
                 time_set_flag = 0;
                 timeout.tv_sec = 0;
-                timeout.tv_usec = 1*1e5;
+//                timeout.tv_usec = 1*1e5;
+                timeout.tv_usec = 0;
                 if(time_list->len > 0)
                 {
                         gettimeofday(&tv2, &tz);
-                        usleep(1e6 - (tv2.tv_usec - tv1.tv_usec));
+                        usleep(10000000 - (tv2.tv_usec - tv1.tv_usec));
                         /* Update data*/
-                        time_list->head->time = time_list->head->time - (1e6 - (tv2.tv_usec - tv1.tv_usec));                        
+                        time_list->head->time = time_list->head->time - (1000000 - (tv2.tv_usec - tv1.tv_usec));                        
                         if(expire(time_list) == TRUE)
                         {
                                 gettimeofday(&tv2, &tz);
@@ -127,8 +128,6 @@ int main()
                                 {
                                         time_list->tail == NULL;
                                 }
-
-				
                                 print_list(time_list);
                         }
                 }
