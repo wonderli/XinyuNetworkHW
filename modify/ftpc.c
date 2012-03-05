@@ -141,7 +141,8 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
 
         bcopy(&file_size, read_file_buf, sizeof(int));
         bcopy(filename, read_file_buf+4, 20);
-        bcopy(send_msg.packet.data, read_file_buf, 24);//send file name
+        //bcopy(send_msg.packet.data, read_file_buf, 24);//send file name
+        bcopy(read_file_buf,send_msg.packet.data, 24);//send file name
         SEND(sck,&send_msg,sizeof(TCPD_MSG),0);
         bzero(read_file_buf, MAXBUF);
 
