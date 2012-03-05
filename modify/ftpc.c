@@ -163,6 +163,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                         RECV_CONTROL(control_sck, &recv_msg, sizeof(TCPD_MSG), 0);
                         if(recv_msg.packet.stop == 1)
                         {
+                                send_msg.packet.seq_num--;
                                 printf("\nreceive stop signal, stop sending msg\n");
                                 usleep(10000);
                         }
