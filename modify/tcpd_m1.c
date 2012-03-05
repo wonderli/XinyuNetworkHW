@@ -14,7 +14,7 @@ void print_win()
         int i = 0;
         for(i = 0; i < 64; i++)
         {
-                printf("%d->", window_srv[i]);
+                printf("%d~", window_srv[i]);
         }
 }
 int main(int argc, char* argv[]) /* server program called with no argument */
