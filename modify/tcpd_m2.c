@@ -4,7 +4,7 @@
 #include "troll.h"
 #include "deltalist.h"
 #include "crc.h"
-#define STOP_SEQ 27
+#define STOP_SEQ 60
 struct TCPD_MSG buffer[64];
 int window[20];
 int locate_in_buffer(int seq_num)
