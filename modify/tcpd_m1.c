@@ -304,7 +304,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                        printf("\nLAST SENT: %d\n", lastsent);
 //                                        printf("\nACK.PACKET.ACK_SEQ: %d\n", ack.packet.ack_seq);
                                         ack_buffer[pointer] = recv_buffer[buffer_index].packet.seq_num;
-                                        printf("\nPTR Value %d\n", pointer);
+                                        printf("\nPTR Value %d; lastsent = %d\n", pointer, lastsent);
                                         pointer = (pointer + 1)%64;
 //
 //                                        if(pointer < 63)
