@@ -308,7 +308,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 					for(i = 0; i < 20; i++)
 					{
-						if(window[i] == ack_msg.packet.ack_seq);
+						if(window[i] == ack_msg.packet.ack_seq)
 						{
                                                         printf("I've cleaned window: windoes[%d]\n, WINDOWS[i]: %d, SEQ: %d", i, window[i],ack_msg.packet.ack_seq);
 							window[i] = -1;//RECV ACK
