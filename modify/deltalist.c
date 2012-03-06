@@ -277,7 +277,7 @@ int print_list(linklist *list)
         {
                 seq = ptr->seq;
                 time = ptr->time;
-                printf("(%d, %f)->", seq, time);
+                printf("(%d, %d)->", seq, time);
                 ptr = ptr->next;
                 i++;
         }
@@ -291,7 +291,7 @@ int print_list(linklist *list)
         for (ptr = list->tail, i = 0; ptr != NULL; ptr = ptr->prev) {
                 seq = ptr->seq;
                 time = ptr->time;
-                printf("(%d, %f)->", seq, time);
+                printf("(%d, %d)->", seq, time);
                 i++;
         }
         printf("\n");
