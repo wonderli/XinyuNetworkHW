@@ -255,7 +255,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         crc_match = FALSE;//checksum wrong
                 }
 //
-                if(crc_match == TRUE)
+//                if(crc_match == TRUE)
+                if(1)
                 {
 //                        printf("\nENTER IF CRC_MATCH\n");
 //                        //find the lowest window seq;
