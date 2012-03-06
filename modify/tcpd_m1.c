@@ -296,6 +296,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
 //
                                 lastsent = recv_buffer[buffer_index].packet.seq_num;
+                                printf("[%d]finish bit: %d\n", 
+                                       recv_buffer[buffer_index].packet.seq_num, 
+                                       recv_buffer[buffer_index].packet.fin);
+
                                 if(recv_buffer[buffer_index].packet.fin != 1)
                                 {
                                         ack.packet.ack = 1;
@@ -324,7 +328,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         printf("\nACK SEQ SENT:%d\n", recv_buffer[buffer_index].packet.seq_num);
                                         window_srv[lowest_seq_window_index] = -1;
                                 }//end if fin != 1
-                                else if(recv_buffer[buffer_index].packet.fin == 1)
+                                else
                                 {
                                         printf("\nRECEIVE FIN!!! seq: %d\n", recv_buffer[buffer_index].packet.seq_num);
 //                                        sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
@@ -342,7 +346,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                        close(sock_ack);
 //                                        close(sock_from_troll_m2);
 //                                        close(sock_ftps);
-//                                        exit(0);
+                                        exit(0);
                                 }
                         }//END IF LAST SENT
 //                        else
