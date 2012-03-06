@@ -33,7 +33,7 @@ typedef struct TCPD_MSG {
 	//struct packet packet;
         struct sockaddr_in tcpd_header;
         PACKET_DATA packet;
-        unsigned long checksum;
+        unsigned short checksum;
 } TCPD_MSG;
 typedef struct troll_msg {
 	struct sockaddr_in troll_header;
