@@ -88,7 +88,7 @@ int is_acceptable_seq(int seq)
 
         if (lowest_idx < 0)
                 accept = 1;
-        else if (seq < lowest_idx)
+        else if (seq < lowest - lowest_idx)
                 accept = 0;
         else if (seq > lowest + (19 - lowest_idx))
                 accept = 0;
@@ -230,6 +230,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
                         if (!is_acceptable_seq(recv_buffer[head].packet.seq_num)) {
                                 printf("OUT OF window BOUND\n");
+                                FD_ZERO(&read_fds);
+                                FD_SET(sock_from_troll_m2,&read_fds);
                                 continue;
                         }
 
