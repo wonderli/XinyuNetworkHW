@@ -257,7 +257,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			timer_send.time = RTO(time_rem, buffer[index].packet.seq_num);
 			timer_send.action = START;
                         printf("\nSEND SEQ: %d to TIMER\n", timer_send.seq);
-			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
+			//sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
 			
 			ptr++;//move window index
 			head = (head + 1) % 64;//wrap buffer
@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 					timer_send.action = CANCEL;
 					timer_send.time = 0;//Don't know whether this will work or not
                                         printf("\nCANCEL TIMER\n");
-					sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
+					//sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
 
 					for(i = 0; i < 20; i++)
 					{
@@ -335,7 +335,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						timer_send.action = CANCEL;
 						timer_send.time = 0;
                                                 printf("\n CANCEL NODE SEQ: %d\n", timer_send.seq);
-						sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
+						//sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr *) &timer_send_addr, sizeof(timer_send_addr));
 						close(sock_troll);
 						close(sock_ftpc);
 						exit(0);
