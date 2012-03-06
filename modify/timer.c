@@ -55,7 +55,7 @@ int main()
         int time_set_flag = 0;
         int len = sizeof(timer_recv_addr);
         int MAXFD = sock_timer_recv + 1;
-        unsigned delta_time;
+        long delta_time;
         FD_ZERO(&fd_read_set);
         FD_SET(sock_timer_recv, &fd_read_set);
 
