@@ -275,7 +275,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			gettimeofday(&time_start, NULL);
 			timer_send.seq = buffer[index].packet.seq_num;
 			//timer_send.time = RTO(time_rem, buffer[index].packet.seq_num);
-			timer_send.time = 2000000;
+			timer_send.time = 200000;
 			timer_send.action = START;
                         printf("\nSEND SEQ: %d to TIMER\n", timer_send.seq);
 			sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
@@ -401,7 +401,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
                                 gettimeofday(&time_start, NULL);
                                 //timer_send.time = RTO(time_rem, buffer[resend_pkt].packet.seq_num);
-                                timer_send.time = 2000000;
+                                timer_send.time = 200000;
                                 timer_send.seq = buffer[resend_pkt].packet.seq_num;
                                 timer_send.action = START;
                                 sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(timer_send_addr));
