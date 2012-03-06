@@ -15,6 +15,6 @@
 #define TRUE 1
 #define FALSE 0
 #define SOCK_BUFF_SIZE (128*1024)
-#define STOP_SEQ 17
+#define STOP_SEQ 27
 
 #endif
