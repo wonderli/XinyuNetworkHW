@@ -5,7 +5,7 @@
 #include "troll.h"
 #include "crc.h"
 int window_srv[20];
-int ptr = 0;
+int pointer = 0;
 int ack_buffer[64];
 TCPD_MSG recv_buffer[64];
 //int find_min()
@@ -303,16 +303,18 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                        //lastsent = recv_buffer[buffer_index].packet.seq_num;
 //                                        printf("\nLAST SENT: %d\n", lastsent);
 //                                        printf("\nACK.PACKET.ACK_SEQ: %d\n", ack.packet.ack_seq);
-                                        ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
+                                        ack_buffer[pointer] = recv_buffer[buffer_index].packet.seq_num;
+                                        printf("\nPTR Value %d\n", pointer);
+                                        pointer = (pointer + 1)%64;
 //
-                                        if(ptr < 63)
-                                        {
-                                                ptr++;
-                                        }
-                                        else
-                                        {
-                                                ptr = 0;
-                                        }
+//                                        if(pointer < 63)
+//                                        {
+//                                                pointer++;
+//                                        }
+//                                        else
+//                                        {
+//                                                pointer = 0;
+//                                        }
 //
                                         ack.checksum = cal_crc((void*)&ack.packet, sizeof(struct packet_data));
 //					printf("\nACK CHECKSUM %d\n", ack.checksum);
