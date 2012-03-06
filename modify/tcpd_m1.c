@@ -75,6 +75,7 @@ int is_acceptable_seq(int seq)
         int lowest = 10000000;
         int lowest_idx = -1;
         int i =0;
+        accept = 1;
 
         for(i = 0; i < 20; i++) {
                 printf("|%d", window_srv[i]);
@@ -86,14 +87,14 @@ int is_acceptable_seq(int seq)
         printf("\n");
 
         if (lowest_idx < 0)
-                return 1;
+                accept = 1;
+        else if (seq < lowest_idx)
+                accept = 0;
+        else if (seq > lowest + (19 - i))
+                accept = 0;
 
-        if (seq < lowest_idx)
-                return 0;
-        if (seq > lowest + (19 - i))
-                return 0;
-
-        return 1;
+        printf("lowest: %d, highest: %d\n", lowest, lowest + (19 - i));
+        return accept;
 }
 
 int main(int argc, char* argv[]) /* server program called with no argument */
