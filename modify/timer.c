@@ -99,7 +99,7 @@ int main()
                 if(time_list->len > 0)
                 {
                         gettimeofday(&tv2, &tz);
-                        usleep(10000000 - (tv2.tv_usec - tv1.tv_usec));
+                        usleep(1000000 - (tv2.tv_usec - tv1.tv_usec));
                         /* Update data*/
                         time_list->head->time = time_list->head->time - (1000000 - (tv2.tv_usec - tv1.tv_usec));                        
                         if(expire(time_list) == TRUE)
@@ -115,17 +115,17 @@ int main()
                                         time_msg_send.action = EXPIRE;
                                         time_msg_send.time = 0;
                                         printf("\nBEGIN REMOVE NODE\n");
-                          //              again:
-                       //                if(errno == EINTR) goto again;
                                         remove_node(expire_node);
                                         time_list->len--;
-if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
+                                        again:
+                                        if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
                                         {
                                                 perror("\nTIMER SEND ERROR\n");
                                                 exit(1);
                                         }
                                         printf("\nREMOVE NODE\n");
-                                                                        }
+                                       if(errno == EINTR) goto again;
+                                }
                                 time_list->head = ptr;
                                 if(time_list->head == NULL)
                                 {
