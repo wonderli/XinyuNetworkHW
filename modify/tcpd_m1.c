@@ -59,6 +59,38 @@ void print_win()
                 printf("%d~", window_srv[i]);
         }
 }
+
+int is_window_full() 
+{
+        int i = 0;
+        for(i = 0; i < 20; i++) {
+                if (window_srv[i] < 0)
+                        return 0;
+        }
+        return 1;
+}
+
+int is_acceptable_seq(int seq)
+{
+        int lowest = 10000000;
+        int lowest_idx = -1;
+        int i =0;
+
+        for(i = 0; i < 20; i++) {
+                if (window_srv[i] > 0 && window_srv[i] < lowest)  {
+                        lowest = window_srv[i];
+                        lowest_idx = i;
+                }
+        }
+
+        if (seq < lowest_idx)
+                return 0;
+        if (seq > lowest + (19 - i))
+                return 0;
+
+        return 1;
+}
+
 int main(int argc, char* argv[]) /* server program called with no argument */
 {
         int sock_ftps, ftps_addr_len;
@@ -189,6 +221,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
                         }
                         printf("\nRECV FROM TROLL_M2, SEQ:%d\n", recv_buffer[head].packet.seq_num);
+
+                        if (is_acceptable_seq(recv_buffer[head].packet.seq_num)) {
+                                printf("OUT OF window BOUND\n");
+                                continue;
+                        }
+
 
                         checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
 
