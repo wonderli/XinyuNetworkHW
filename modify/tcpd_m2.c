@@ -286,7 +286,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
 			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
-                        printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", recv_checksum, ack_msg.checksum);
+                        //printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", recv_checksum, ack_msg.checksum);
                         printf("\nACK SEQ: %d\n", ack_msg.packet.ack_seq);
 
 			if(ack_msg.checksum == recv_checksum)
@@ -309,6 +309,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         //                break;
 						}
 					}
+                                        printf("\nAFTER RECV ACK THE WIN IS:");
                                         print_win();
 
                                         control_msg.packet.stop = 0;//WINDOW NOT FULL, KEEP SENDING

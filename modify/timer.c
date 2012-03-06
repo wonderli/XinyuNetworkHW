@@ -120,11 +120,11 @@ int main()
                                         again:
                                         if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
                                         {
+                                               if(errno == EINTR) goto again;
                                                 perror("\nTIMER SEND ERROR\n");
                                                 exit(1);
                                         }
                                         printf("\nREMOVE NODE\n");
-                                       if(errno == EINTR) goto again;
                                 }
                                 time_list->head = ptr;
                                 if(time_list->head == NULL)
