@@ -255,24 +255,24 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         crc_match = FALSE;//checksum wrong
                 }
 //
-//                if(crc_match == TRUE)
-//                {
+                if(crc_match == TRUE)
+                {
 //                        printf("\nENTER IF CRC_MATCH\n");
 //                        //find the lowest window seq;
-//                        lowest_seq = 100000;
-//                        for(i = 0; i < 20; i++)
-//                        {
-//                                if(window_srv[i] < lowest_seq && window_srv[i] != -1)
-//                                {
-//                                        lowest_seq = window_srv[i];
-//                                        lowest_seq_window_index = i;
-//                                }
-//                        }
+                        lowest_seq = 100000;
+                        for(i = 0; i < 20; i++)
+                        {
+                                if(window_srv[i] < lowest_seq && window_srv[i] != -1)
+                                {
+                                        lowest_seq = window_srv[i];
+                                        lowest_seq_window_index = i;
+                                }
+                        }
 ////                        lowest_seq = find_min();
 ////                        lowest_seq_window_index = find_min_win_index(lowest_seq);
-//                        printf("\nLOWEST_SEQ %d\n", lowest_seq);
-//                        printf("\nLASTSENT: %d\n", lastsent);
-//                        print_win();
+                        printf("\nLOWEST_SEQ %d\n", lowest_seq);
+                        printf("\nLASTSENT: %d\n", lastsent);
+                        print_win();
 //                        if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
 //                        {
 //                                int buffer_index = 0;
@@ -342,7 +342,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                printf("\nSLEEP FOR WAITING\n");
 //                                usleep(100000);
 //                        }//END LOW
-//                }
+                }
 //                else if(crc_match == FALSE)
 //                {
 //                        printf("\nCRC WRONG, RETRANSMIT\n");
