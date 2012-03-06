@@ -241,7 +241,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         //printf("\nHEAD IS %d\n", head);
                         buflen = recvfrom(sock_ftpc, (void *)&buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftpc_addr, &ftpc_addr_len);
                         printf("\nRECVFROM FTPC: SEQ: %d\n", buffer[head].packet.seq_num);
-                        print_win();
+                        //print_win();
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
@@ -274,10 +274,11 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			timer_send.action = START;
                         printf("\nSEND SEQ: %d to TIMER\n", timer_send.seq);
 			//sendto(sock_timer_send, &timer_send, sizeof(TIME_MSG), 0, (struct sockaddr *)&timer_send_addr, sizeof(timer_send_addr));//send to timer
+                        print_win();
 			
 			ptr++;//move window index
 			head = (head + 1) % 64;//wrap buffer
-			if(ptr > window_end)
+			if(ptr >= window_end)
 			{
 				printf("\nWINDOW FULL, SLEEP\n");
 				control_msg.packet.stop = 1;
@@ -324,11 +325,11 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                                         printf("I've cleaned window: windoes[%d]\n, WINDOWS[i]: %d, SEQ: %d", i, window[i],ack_msg.packet.ack_seq);
 							window[i] = -1;//RECV ACK
                                         //                break;
-                                                        print_win();
+                                                        //print_win();
 						}
 					}
                                         printf("\nAFTER RECV ACK THE WIN IS:");
-                                        print_win();
+//                                        print_win();
 
                                         //control_msg.packet.stop = 0;//WINDOW NOT FULL, KEEP SENDING
                                         //sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
