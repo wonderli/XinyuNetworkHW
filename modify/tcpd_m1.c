@@ -227,7 +227,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         }
                         printf("\nRECV FROM TROLL_M2, SEQ:%d\n", recv_buffer[head].packet.seq_num);
 
-                        if (is_acceptable_seq(recv_buffer[head].packet.seq_num)) {
+                        if (!is_acceptable_seq(recv_buffer[head].packet.seq_num)) {
                                 printf("OUT OF window BOUND\n");
                                 continue;
                         }
