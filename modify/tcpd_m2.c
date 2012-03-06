@@ -306,6 +306,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
 							window[i] = -1;//RECV ACK
+                                                        break;
 						}
 					}
 
