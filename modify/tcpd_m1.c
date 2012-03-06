@@ -7,6 +7,8 @@
 int window_srv[20];
 int pointer = 0;
 int ack_buffer[64];
+
+int nr_failed_acks;
 TCPD_MSG recv_buffer[64];
 //int find_min()
 //{
@@ -75,6 +77,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 	struct hostent *hp;
 	hp = gethostbyname(argv[1]);
+        nr_failed_acks = 0;
 	if(hp == 0)
 	{
 		perror("Unknown host");
@@ -330,9 +333,14 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //					printf("\nACK CHECKSUM %d\n", ack.checksum);
                                         ack.tcpd_header = ack_addr; 
 //                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
-                                        if(ack.packet.ack_seq % 5 == 0)
+                                        if(ack.packet.ack_seq != 5)
                                         {
                                                 sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
+                                        } else {
+                                                if (nr_failed_acks > 1) {
+                                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
+                                                }
+                                                nr_failed_acks++;
                                         }
                                         printf("\nACK SEQ SENT:%d\n", recv_buffer[buffer_index].packet.seq_num);
                                         window_srv[lowest_seq_window_index] = -1;
