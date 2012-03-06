@@ -310,6 +310,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						}
 					}
 
+                                        control_msg.packet.stop = 0;//WINDOW EMPTY, KEEP SENDING
+                                        sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
 					if(window_empty() == TRUE)
 					{
                                                 printf("\nWINDOW EMPTY\n");
