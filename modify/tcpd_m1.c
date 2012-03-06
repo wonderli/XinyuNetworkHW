@@ -346,7 +346,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
            }
 //           FD_ZERO(&read_fds);
 //           FD_SET(sock_from_troll_m2,&read_fds);
-      }
+//      }
 
 }
 
