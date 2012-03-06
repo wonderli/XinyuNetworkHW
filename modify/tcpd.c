@@ -52,7 +52,8 @@ float RTO(float M, int packet_ctrl)
 	int RTO = 0;
 	if(packet_ctrl == 0)
 	{
-		RTO = 6000;
+		//RTO = 6000;
+		RTO = 200000000;
 		return RTO;
 	}
 	else if(packet_ctrl == 1)

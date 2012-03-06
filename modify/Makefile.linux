@@ -11,6 +11,6 @@ ftpc: ftpc.c tcpd.h tcpd.c port.h deltalist.h deltalist.c crc.h
 ftps: ftps.c tcpd.h tcpd.c port.h deltalist.h deltalist.c crc.h
 	gcc -g -o ftps ftps.c port.h tcpd.h tcpd.c deltalist.h deltalist.c
 delta: deltalist.c deltalist.h
-	gcc -g -o -DDELTATEST delta deltalist.c deltalist.h
+	gcc -g -DDELTATEST -o delta deltalist.c deltalist.h
 clean:
 	rm tcpd_m1 tcpd_m2 ftpc ftps recv/* *~

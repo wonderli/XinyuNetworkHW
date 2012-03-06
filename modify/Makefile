@@ -13,4 +13,4 @@ ftps: ftps.c port.h tcpd.h tcpd.c deltalist.h deltalist.c crc.h
 	gcc -g -o ftps ftps.c port.h tcpd.h tcpd.c deltalist.h deltalist.c crc.h $(LIBS)
 
 clean:
-	rm  tcpd_m1 tcpd_m2 ftpc ftps recv/* *~
+	rm -f tcpd_m1 tcpd_m2 ftpc ftps recv/* *~

@@ -66,14 +66,15 @@ int insert_node(linklist *list, node *n)
 
 		return TRUE;
 	}
+
+        printf("should be added before %d-%d\n", ptr->seq, ptr->time);
         n->prev = ptr->prev;
         if (ptr->prev != NULL) {
                 ptr->prev->next = n;
+        } else {
+                list->head = n;
         }
         ptr->prev = n;
-        if (ptr->next != NULL) {
-                ptr->next->prev = n;
-        }
 
 	for (; ptr != NULL; ptr = ptr->next) {
 		list->tail = ptr;
@@ -158,9 +159,8 @@ int cancel_node(linklist *list, int seq)
         if (found == NULL) {
                 return FALSE;
         }
-
+        
         list->len--;
-
         dtime = found->time;
 
         if (found->prev != NULL) {
@@ -171,8 +171,11 @@ int cancel_node(linklist *list, int seq)
         }
 
         if (found == head) {
-                list->head = NULL;
-                list->tail = NULL;
+                if (list->tail == list->head)
+                        list->tail = NULL;
+                list->head = head->next;
+                head->prev = NULL;
+		free(found);
                 return TRUE;
         }
 
@@ -187,6 +190,7 @@ int cancel_node(linklist *list, int seq)
         if (list->tail == NULL) {
                 list->tail = found->prev;
         }
+	free(found);
 
         /*
         if(ptr == NULL)
@@ -278,30 +282,38 @@ int print_list(linklist *list)
                 i++;
         }
         printf("\n");
+
         if (i != list->len) {
                 printf("ERROR: len should be %d\n", i);
                 return -1;
         }
+        printf("revers: \n");
+        for (ptr = list->tail, i = 0; ptr != NULL; ptr = ptr->prev) {
+                seq = ptr->seq;
+                time = ptr->time;
+                printf("(%d, %f)->", seq, time);
+                i++;
+        }
+        printf("\n");
+        if (i != list->len) {
+                printf("REVERROR: len should be %d in reverse order\n", i);
+                return -1;
+        }
+
         return 0;
 }
 
 /* Test the head of this list whether expired or not*/
 int expire(linklist *list)
 {
-	if(list == NULL)
-	{
-		perror("list doesn't exits!");
-	}
-	else
-	{
-		if(list->head->time <= 0)
-                {
-			return TRUE;
-                }
-	}
-	return FALSE;
+	if (list == NULL || list->head == NULL)
+		return 0;
+	if (list->head->time <= 0)
+		return 1;
+	return 0;
 }
 
+#ifdef DELTATEST
 int insert_and_print(linklist *List, int seq, int time) {
         node* a = creat_node(seq, time);
         printf("INSERT: %d %d\n", seq, time);
@@ -323,19 +335,21 @@ int main()
 {
         linklist *List = create_list();
 
-        insert_and_print(List, 1, 359);
-        insert_and_print(List, 2, 9403);
-        insert_and_print(List, 3, 9403);
-        insert_and_print(List, 4, 9403);
-        insert_and_print(List, 5, 9403);
-        cancel_and_print(List, 5);
+        insert_and_print(List, 1, -30);
+        insert_and_print(List, 2, -20);
+        insert_and_print(List, 3, 20);
+        insert_and_print(List, 4, 10);
+        /*
+        cancel_and_print(List, 1);
         insert_and_print(List, 6, 9270);
         insert_and_print(List, 7, 9270);
         insert_and_print(List, 8, 9270);
         insert_and_print(List, 9, 9270);
         insert_and_print(List, 10, 9270);
         cancel_and_print(List, 10);
+        */
 
         return 0;
 }
 
+#endif
