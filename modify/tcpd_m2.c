@@ -237,8 +237,6 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
-                        printf("\nNOW THE WINDOW IS:\n");
-                        print_win();
                         for(i = 0; i < 64; i++)
                         {
                                 if(buffer[i].packet.seq_num == window[ptr])
@@ -311,6 +309,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         //                break;
 						}
 					}
+                                        print_win();
 
                                         control_msg.packet.stop = 0;//WINDOW NOT FULL, KEEP SENDING
                                         sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
