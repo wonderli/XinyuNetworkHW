@@ -77,11 +77,13 @@ int is_acceptable_seq(int seq)
         int i =0;
 
         for(i = 0; i < 20; i++) {
+                printf("|%d", window_srv[i]);
                 if (window_srv[i] > 0 && window_srv[i] < lowest)  {
                         lowest = window_srv[i];
                         lowest_idx = i;
                 }
         }
+        printf("\n");
 
         if (lowest_idx < 0)
                 return 1;
