@@ -251,7 +251,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         //print_win();
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
-                        buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
+                        buffer[head].checksum = cal_crc((void *)&buffer[head].packet, (unsigned char)sizeof(struct packet_data));
+                        printf("\nCRC IS %ud\n", buffer[head].checksum);
                         for(i = 0; i < 64; i++)
                         {
                                 if(buffer[i].packet.seq_num == window[ptr])
@@ -312,7 +313,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
-			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
+			recv_checksum = cal_crc((void*)&ack_msg.packet, (unsigned char)sizeof(struct packet_data));
                         //printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", recv_checksum, ack_msg.checksum);
                         printf("\nACK SEQ: %d\n", ack_msg.packet.ack_seq);
 

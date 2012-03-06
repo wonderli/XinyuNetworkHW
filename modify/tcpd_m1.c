@@ -105,7 +105,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         int sock_ftps, ftps_addr_len;
 	int sock_from_troll_m2, from_troll_addr_len;
 	int sock_ack, ack_addr_len;
-	unsigned long checksum = 0;
+	unsigned short checksum = 0;
 
         int buflen = 0;
 	int head = 0;
@@ -241,9 +241,9 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         }
 
 
-                        checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
+                        checksum = cal_crc((void *)&recv_buffer[head].packet, (unsigned char)sizeof(struct packet_data));//CRC
 
-                        //printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", checksum, recv_buffer[head].checksum);
+                        printf("\nCAL CHECKSUM: %u, RECV CHECKSUM: %u\n", checksum, recv_buffer[head].checksum);
                         if(checksum == recv_buffer[head].checksum)
                         {
                                 crc_match = TRUE;
@@ -299,7 +299,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         ack.packet.ack = 1;
                                         ack.packet.ack_seq = recv_buffer[head].packet.seq_num;
                                         ack.tcpd_header = ack_addr;
-                                        ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+                                        ack.checksum = cal_crc((void *)&ack.packet, (unsigned char)sizeof(struct packet_data));
                                         //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
                                         if(sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr)) < 0)
                                         {
@@ -380,7 +380,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                                pointer = 0;
 //                                        }
 //
-                                        ack.checksum = cal_crc((void*)&ack.packet, sizeof(struct packet_data));
+                                        ack.checksum = cal_crc((void*)&ack.packet, (unsigned char)sizeof(struct packet_data));
 //					printf("\nACK CHECKSUM %d\n", ack.checksum);
                                         ack.tcpd_header = ack_addr; 
 //                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
@@ -406,7 +406,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         ack.packet.fin_ack = 1;
                                         ack.packet.ack = 0;
                                         ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
-                                        ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+                                        ack.checksum = cal_crc((void *)&ack.packet, (unsigned char)sizeof(struct packet_data));
                                         window_srv[lowest_seq_window_index] = -1;
                                         strcpy(ack.packet.data, "FIN");
                                         //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
