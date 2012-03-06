@@ -77,6 +77,7 @@ int main()
                                 perror("recvfrom TCPD_M2 error");
                                 exit(0);
                         }
+                        //print_list(time_list);
                         if(time_msg_recv.action == CANCEL) /* Cancel node*/
                         {
                                 printf("\ncancel node\n");
@@ -125,13 +126,13 @@ int main()
                                                 exit(1);
                                         }
                                         printf("\nREMOVE NODE\n");
+                                        print_list(time_list);
                                 }
                                 time_list->head = ptr;
                                 if(time_list->head == NULL)
                                 {
                                         time_list->tail = NULL;
                                 }
-                                print_list(time_list);
                         }
                 }
                         /* Print deltalist */
