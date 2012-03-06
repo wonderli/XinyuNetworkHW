@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	int j = 0;
 
         int new_buf_size = SOCK_BUFF_SIZE;
+        int window_end = 20;
 
 
 
@@ -276,7 +277,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			
 			ptr++;//move window index
 			head = (head + 1) % 64;//wrap buffer
-			if(ptr >= 19)
+			if(ptr >= window_end)
 			{
 				printf("\nWINDOW FULL, SLEEP\n");
 				control_msg.packet.stop = 1;
