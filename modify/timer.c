@@ -116,10 +116,21 @@ int main()
                                         time_msg_send.action = EXPIRE;
                                         time_msg_send.time = 0;
                                         printf("\nBEGIN REMOVE NODE\n");
+                                        if (expire_node->prev != NULL) {
+                                                expire_node->prev->next = expire_node->next;
+                                        }
+                                        if (expire_node->next != NULL) {
+                                                expire_node->next->prev = expire_node->prev;
+                                        }
                                         remove_node(expire_node);
+                                        //cancel_node(time_list,expire_node);
                                         time_list->len--;
+                                        if (time_list->len <= 0) {
+                                                time_list->head = NULL;
+                                        }
+                                        
                                         again:
-                                        if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
+                                        if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0)
                                         {
                                                if(errno == EINTR) goto again;
                                                 perror("\nTIMER SEND ERROR\n");

@@ -161,6 +161,7 @@ int remove_node(node *remove_node)
         {
                 remove_node->prev = NULL;
                 remove_node->next = NULL;
+                
                 free(remove_node);    
         }
         else
