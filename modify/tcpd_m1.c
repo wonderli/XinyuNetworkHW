@@ -6,6 +6,7 @@
 #include "crc.h"
 int window_srv[20];
 int pointer = 0;
+int lastsent = -1;
 int ack_buffer[64];
 
 int nr_failed_acks;
@@ -72,28 +73,22 @@ int is_window_full()
 
 int is_acceptable_seq(int seq)
 {
-        int lowest = 10000000;
-        int lowest_idx = -1;
-        int i = 0;
+        int lowest_seq;
+        int highest_seq;
         int accept = 1;
 
-        for(i = 0; i < 20; i++) {
-                printf("|%d", window_srv[i]);
-                if (window_srv[i] > 0 && window_srv[i] < lowest)  {
-                        lowest = window_srv[i];
-                        lowest_idx = i;
-                }
-        }
-        printf("\n");
-
-        if (lowest_idx < 0)
+        if (lastsent < 0) {
                 accept = 1;
-        else if (seq < lowest - lowest_idx)
-                accept = 0;
-        else if (seq > lowest + (19 - lowest_idx))
-                accept = 0;
+        } else {
+                lowest_seq = (lastsent / 20) * 20;
+                highest_seq = lowest_seq + 20;
+                if (seq < lowest_seq || seq > highest_seq)
+                        accept = 0;
+                else
+                        accept = 1;
+        }
 
-        printf("accept: %d, lowest: %d, highest: %d, seq: %d\n", accept, lowest, lowest + (19 - lowest_idx), seq);
+        printf("accept: %d, lowest: %d, highest: %d, seq: %d\n", accept, lowest_seq, highest_seq, seq);
         return accept;
 }
 
@@ -137,7 +132,6 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 	int lowest_seq = 100000; 
 	int lowest_seq_window_index = 0;
-	int lastsent = -1;
         fd_set read_fds;
 	
         int new_buf_size = SOCK_BUFF_SIZE;
