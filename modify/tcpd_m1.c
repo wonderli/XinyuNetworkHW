@@ -182,58 +182,58 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         }
                         printf("\nRECV FROM TROLL_M2, SEQ:%d\n", recv_buffer[head].packet.seq_num);
 
-//                        checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
-//
-//                        printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", checksum, recv_buffer[head].checksum);
+                        //checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
+
+                        //printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", checksum, recv_buffer[head].checksum);
 //                        if(checksum == recv_buffer[head].checksum)
 //                        {
 //                                crc_match = TRUE;
-//                                ack_buffer_flag = FALSE;//CHECK FOR DUP
+                                ack_buffer_flag = FALSE;//CHECK FOR DUP
 //
-//                                for(i = 0; i< 64; i++)
-//                                {
-//                                        if(ack_buffer[i] == recv_buffer[head].packet.seq_num)
-//                                        {
-//                                                ack_buffer_flag = TRUE;
-//                                        }
-//                                }
-//                                //printf("\nACK_BUFFER_FLAG STATUS %d\n", ack_buffer_flag);
+                                for(i = 0; i< 64; i++)
+                                {
+                                        if(ack_buffer[i] == recv_buffer[head].packet.seq_num)
+                                        {
+                                                ack_buffer_flag = TRUE;
+                                        }
+                                }
+                                //printf("\nACK_BUFFER_FLAG STATUS %d\n", ack_buffer_flag);
 //
-//                                if(ack_buffer_flag != TRUE)//NOT IN BUFFER
-//                                {
-//                                        ack_exist = FALSE;
-//
-//                                        for(i = 0; i < 20; i++)
-//                                        {
-//                                                //CHECK WHETHER IN WINOW OR NOT
-//                                                if(window_srv[i] == recv_buffer[head].packet.seq_num)
-//                                                {
-//                                                        ack_exist = TRUE;
-//                                                }
-//                                        }      
-//
-//                                        if(ack_exist == TRUE)
-//                                        {
-//                                                printf("\nIN THE WINDOWS, WILL ARRIVE FTPS SOON\n",recv_buffer[head].packet.seq_num);
-//                                        }
-//                                        else if(ack_exist == FALSE)//NOT IN WINDOW
-//                                        {
-//                                                window_index = recv_buffer[head].packet.seq_num % 20;
+                                if(ack_buffer_flag != TRUE)//NOT IN BUFFER
+                                {
+                                        ack_exist = FALSE;
+
+                                        for(i = 0; i < 20; i++)
+                                        {
+                                                //CHECK WHETHER IN WINOW OR NOT
+                                                if(window_srv[i] == recv_buffer[head].packet.seq_num)
+                                                {
+                                                        ack_exist = TRUE;
+                                                }
+                                        }      
+
+                                        if(ack_exist == TRUE)
+                                        {
+                                                printf("\nIN THE WINDOWS, WILL ARRIVE FTPS SOON\n",recv_buffer[head].packet.seq_num);
+                                        }
+                                        else if(ack_exist == FALSE)//NOT IN WINDOW
+                                        {
+                                                window_index = recv_buffer[head].packet.seq_num % 20;
 //                                                //window_index = recv_buffer[head].packet.seq_num;
-//                                                window_srv[window_index] = recv_buffer[head].packet.seq_num;
-//                                                printf("\nWIN SRV [%d]:%d\n",window_index, recv_buffer[head].packet.seq_num);
+                                                window_srv[window_index] = recv_buffer[head].packet.seq_num;
+                                                printf("\nWIN SRV [%d]:%d\n",window_index, recv_buffer[head].packet.seq_num);
+
+                                                if(head < 63)
+                                                {
+                                                        head++;
+                                                }
+                                                else
+                                                {
+                                                        head = 0;//Make buffer back
 //
-//                                                if(head < 63)
-//                                                {
-//                                                        head++;
-//                                                }
-//                                                else
-//                                                {
-//                                                        head = 0;//Make buffer back
-//
-//                                                }
-//                                        }
-//                                }//end if ack_flag
+                                                }
+                                        }
+                                }//end if ack_flag
 //                                else if(ack_buffer_flag == TRUE)
 //                                {
 //                                        printf("\nACK FOR DUPLICATE AGAIN\n");
