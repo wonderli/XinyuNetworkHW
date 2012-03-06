@@ -308,11 +308,11 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
 							window[i] = -1;//RECV ACK
-                                                        break;
+                                        //                break;
 						}
 					}
 
-                                        control_msg.packet.stop = 0;//WINDOW EMPTY, KEEP SENDING
+                                        control_msg.packet.stop = 0;//WINDOW NOT FULL, KEEP SENDING
                                         sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
 					if(window_empty() == TRUE)
 					{
