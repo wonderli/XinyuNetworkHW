@@ -90,10 +90,10 @@ int is_acceptable_seq(int seq)
                 accept = 1;
         else if (seq < lowest_idx)
                 accept = 0;
-        else if (seq > lowest + (19 - i))
+        else if (seq > lowest + (19 - lowest_idx))
                 accept = 0;
 
-        printf("accept: %d, lowest: %d, highest: %d, seq: %d\n", accept, lowest, lowest + (19 - i), seq);
+        printf("accept: %d, lowest: %d, highest: %d, seq: %d\n", accept, lowest, lowest + (19 - lowest_idx), seq);
         return accept;
 }
 
