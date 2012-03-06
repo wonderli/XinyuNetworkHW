@@ -75,7 +75,7 @@ int is_acceptable_seq(int seq)
         int lowest = 10000000;
         int lowest_idx = -1;
         int i =0;
-        accept = 1;
+        int accept = 1;
 
         for(i = 0; i < 20; i++) {
                 printf("|%d", window_srv[i]);
