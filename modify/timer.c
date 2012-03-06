@@ -79,12 +79,12 @@ int main()
                         }
                         if(time_msg_recv.action == CANCEL) /* Cancel node*/
                         {
-                                printf("cancel node\n");
+                                printf("\ncancel node\n");
                                 cancel_node(time_list, time_msg_recv.seq);
                                 print_list(time_list);
                         }else if(time_msg_recv.action == START) /* Add node for timing */
                         {
-                                printf("start node\n");
+                                printf("\nstart node\n");
                                 node *new_node = creat_node(time_msg_recv.seq, time_msg_recv.time);
                                 insert_node(time_list, new_node);
                                 print_list(time_list);
@@ -115,22 +115,21 @@ int main()
                                         time_msg_send.action = EXPIRE;
                                         time_msg_send.time = 0;
                                         printf("\nBEGIN REMOVE NODE\n");
-                                        again:
-                                        if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
+                          //              again:
+                       //                if(errno == EINTR) goto again;
+                                        remove_node(expire_node);
+                                        time_list->len--;
+if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0);
                                         {
                                                 perror("\nTIMER SEND ERROR\n");
                                                 exit(1);
                                         }
                                         printf("\nREMOVE NODE\n");
-                                        if(errno == EINTR) goto again;
-
-                                        remove_node(expire_node);
-                                        time_list->len--;
-                                }
+                                                                        }
                                 time_list->head = ptr;
                                 if(time_list->head == NULL)
                                 {
-                                        time_list->tail == NULL;
+                                        time_list->tail = NULL;
                                 }
                                 print_list(time_list);
                         }
