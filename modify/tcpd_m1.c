@@ -296,14 +296,14 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
 //
                                 lastsent = recv_buffer[buffer_index].packet.seq_num;
-//                                if(recv_buffer[buffer_index].packet.fin != 1)
-//                                {
-//                                        ack.packet.ack = 1;
-//                                        ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
+                                if(recv_buffer[buffer_index].packet.fin != 1)
+                                {
+                                        ack.packet.ack = 1;
+                                        ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
 //                                        //lastsent = recv_buffer[buffer_index].packet.seq_num;
 //                                        printf("\nLAST SENT: %d\n", lastsent);
-//                                        printf("\nACK.PACKET.ACK_SEQ: %d\n", ack.packet.ack_seq);
-//                                        ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
+                                        printf("\nACK.PACKET.ACK_SEQ: %d\n", ack.packet.ack_seq);
+                                        ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
 //
 //                                        if(ptr < 63)
 //                                        {
@@ -321,7 +321,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
 //                                        printf("\nACK SEQ SENT:%d\n", recv_buffer[buffer_index].packet.seq_num);
 //                                        window_srv[lowest_seq_window_index] = -1;
-//                                }//end if fin != 1
+                                }//end if fin != 1
 //                                else if(recv_buffer[buffer_index].packet.fin == 1)
 //                                {
 //                                        printf("\nRECEIVE FIN!!!\n");
