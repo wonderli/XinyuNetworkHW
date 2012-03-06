@@ -311,14 +311,16 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
 							window[i] = -1;//RECV ACK
+                                                        printf("I've cleaned window: windoes[%d]\n", i);
                                         //                break;
+                                                        print_win();
 						}
 					}
                                         printf("\nAFTER RECV ACK THE WIN IS:");
                                         print_win();
 
-                                        control_msg.packet.stop = 0;//WINDOW NOT FULL, KEEP SENDING
-                                        sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
+                                        //control_msg.packet.stop = 0;//WINDOW NOT FULL, KEEP SENDING
+                                        //sendto(sock_control, (void *)&control_msg, sizeof(TCPD_MSG), 0, (struct sockaddr *)&control_addr, sizeof(control_addr));
 					if(window_empty() == TRUE)
 					{
                                                 printf("\nWINDOW EMPTY\n");
