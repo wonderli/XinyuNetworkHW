@@ -135,7 +135,8 @@ int main(int argc, char *argv[])
 			exit(0);
 
 		}
-			write(fd, recv_msg.packet.data, sizeof(recv_msg.packet.data));
+			//write(fd, recv_msg.packet.data, sizeof(recv_msg.packet.data));
+			write(fd, recv_msg.packet.data, recv_msg.packet.length);
 
 	}
 	
