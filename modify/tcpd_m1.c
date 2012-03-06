@@ -157,6 +157,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	ftps_addr_len=sizeof(struct sockaddr_in);
 	from_troll_addr_len=sizeof(struct sockaddr_in);
 	ack_addr_len  = sizeof(struct sockaddr_in);
+        bzero(ack.packet.data, MAXBUF);
         
 
        // recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
@@ -285,7 +286,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
                                         //lastsent = recv_buffer[buffer_index].packet.seq_num;
                                         printf("\nLAST SENT: %d\n", lastsent);
-                                        printf("\nPTTTTR: %d, ack_buffer[prt] %d\n", ptr, ack_buffer[ptr]);
+                                        printf("\nACK.PACKET.ACK_SEQ: %d\n", ack.packet.ack_seq);
                                         ack_buffer[ptr] = recv_buffer[buffer_index].packet.seq_num;
 
                                         if(ptr < 63)
