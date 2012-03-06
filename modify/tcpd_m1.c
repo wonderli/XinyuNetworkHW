@@ -134,6 +134,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         }
 
         setsockopt(sock_from_troll_m2, SOL_SOCKET, SO_RCVBUF, &new_buf_size, sizeof(&new_buf_size));
+
 	if((sock_ack = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
 		perror("opening datagram socket for send ack to tcpd_m2");
 		exit(1);

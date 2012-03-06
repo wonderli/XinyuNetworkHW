@@ -14,6 +14,6 @@
 #define MAXBUF 1000
 #define TRUE 1
 #define FALSE 0
-#define SOCK_BUFF_SIZE 128*1024
+#define SOCK_BUFF_SIZE (128*1024)
 
 #endif
