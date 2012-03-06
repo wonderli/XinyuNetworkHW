@@ -260,9 +260,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                        printf("\nENTER IF CRC_MATCH\n");
 //                        //find the lowest window seq;
                         lowest_seq = 100000;
+                        lowest_seq_window_index = -1;
                         for(i = 0; i < 20; i++)
                         {
-                                if(window_srv[i] < lowest_seq && window_srv[i] != -1)
+                                if((window_srv[i] < lowest_seq) && (window_srv[i] != -1))
                                 {
                                         lowest_seq = window_srv[i];
                                         lowest_seq_window_index = i;
@@ -273,23 +274,28 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         printf("\nLOWEST_SEQ %d\n", lowest_seq);
                         printf("\nLASTSENT: %d\n", lastsent);
                         print_win();
-//                        if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
-//                        {
-//                                int buffer_index = 0;
-//                                for(i = 0; i < 64; i++)
-//                                {
-//                                        if(recv_buffer[i].packet.seq_num == lowest_seq)
-//                                        {
-//                                                buffer_index = i;
-//                                                break;
-//                                        }
-//                                }
+                        if(lowest_seq == (lastsent + 1))//if lowest in win is to be sent
+                        {
+                                int buffer_index = 0;
+                                for(i = 0; i < 64; i++)
+                                {
+                                        if(recv_buffer[i].packet.seq_num == lowest_seq)
+                                        {
+                                                buffer_index = i;
+                                                break;
+                                        }
+                                }
 //
 // //                               int buffer_index = find_min_buffer(lowest_seq);
-//                                sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
+                                if(sendto(sock_ftps, (void *)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr)) < 0)
+                                {
+                                        perror("Send to sock_ftps error");
+                                        exit(0);
+
+                                }
 //                                printf("\nSEND SEQ:%d to ftps\n", recv_buffer[buffer_index].packet.seq_num);
 //
-//                                lastsent = recv_buffer[buffer_index].packet.seq_num;
+                                lastsent = recv_buffer[buffer_index].packet.seq_num;
 //                                if(recv_buffer[buffer_index].packet.fin != 1)
 //                                {
 //                                        ack.packet.ack = 1;
@@ -336,7 +342,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                                        close(sock_ftps);
 //                                        exit(0);
 //                                }
-//                        }//END IF LAST SENT
+                        }//END IF LAST SENT
 //                        else
 //                        {
 //                                printf("\nSLEEP FOR WAITING\n");
