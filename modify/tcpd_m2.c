@@ -311,7 +311,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 						if(window[i] == ack_msg.packet.ack_seq);
 						{
 							window[i] = -1;//RECV ACK
-                                                        printf("I've cleaned window: windoes[%d]\n", i);
+                                                        printf("I've cleaned window: windoes[%d]\n, SEQ: %d", i, ack_msg.packet.ack_seq);
                                         //                break;
                                                         print_win();
 						}
