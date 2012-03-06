@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         //printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", checksum, recv_buffer[head].checksum);
                         if(checksum == recv_buffer[head].checksum)
                         {
-//                                crc_match = TRUE;
+                                crc_match = TRUE;
                                 ack_buffer_flag = FALSE;//CHECK FOR DUP
 //
                                 for(i = 0; i< 64; i++)
@@ -250,10 +250,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         printf("\nSEND ACK SEQ %d, TO TROLL M1\n", ack.packet.ack_seq);
                                 }
                 }
-//                else
-//                {
-//                        crc_match = FALSE;//checksum wrong
-//                }
+                else
+                {
+                        crc_match = FALSE;//checksum wrong
+                }
 //
 //                if(crc_match == TRUE)
 //                {
