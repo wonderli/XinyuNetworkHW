@@ -174,7 +174,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 if(FD_ISSET(sock_from_troll_m2, &read_fds))
                 {
 
-                        recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len);
+                        if(recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len) < 0)
+                        {
+                                perror("RECV from troll m2 error");
+                                exit(0);
+
+                        }
                         printf("\nRECV FROM TROLL_M2, SEQ:%d\n", recv_buffer[head].packet.seq_num);
 
                         checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
@@ -216,6 +221,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                                 window_index = recv_buffer[head].packet.seq_num % 20;
                                                 //window_index = recv_buffer[head].packet.seq_num;
                                                 window_srv[window_index] = recv_buffer[head].packet.seq_num;
+                                                printf("\nWIN SRV [%d]:%d\n",window_index, recv_buffer[head].packet.seq_num);
 
                                                 if(head < 63)
                                                 {
