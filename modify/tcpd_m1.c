@@ -166,13 +166,13 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
         while(1)
         {
-                if(select(FD_SETSIZE, &read_fds, NULL, NULL, NULL) < 0)
-                {
-                        perror("SELECT ERROR");
-                        exit(0);
-                }
-                if(FD_ISSET(sock_from_troll_m2, &read_fds))
-                {
+                //if(select(FD_SETSIZE, &read_fds, NULL, NULL, NULL) < 0)
+                //{
+                //        perror("SELECT ERROR");
+                //        exit(0);
+                //}
+                //if(FD_ISSET(sock_from_troll_m2, &read_fds))
+                //{
 
                         if(recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len) < 0)
                         {
@@ -344,8 +344,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         printf("\nCRC WRONG, RETRANSMIT\n");
                 }
            }
-           FD_ZERO(&read_fds);
-           FD_SET(sock_from_troll_m2,&read_fds);
+//           FD_ZERO(&read_fds);
+//           FD_SET(sock_from_troll_m2,&read_fds);
       }
 
 }
