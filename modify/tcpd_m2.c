@@ -246,7 +246,9 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 }
 
                         }
-                        printf("\nINDEX IS %d, SEQ: %d\n", index, buffer[index].packet.seq_num);
+//                        printf("\nINDEX IS %d, SEQ: %d\n", index, buffer[index].packet.seq_num);
+                        printf("\nSENDING SEQ: %d\n", buffer[index].packet.seq_num);
+
                         //index = locate_in_buffer(window[ptr]);
                         sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len);
 
