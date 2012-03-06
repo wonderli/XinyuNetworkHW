@@ -74,7 +74,7 @@ int is_acceptable_seq(int seq)
 {
         int lowest = 10000000;
         int lowest_idx = -1;
-        int i =0;
+        int i = 0;
         int accept = 1;
 
         for(i = 0; i < 20; i++) {
@@ -93,7 +93,7 @@ int is_acceptable_seq(int seq)
         else if (seq > lowest + (19 - i))
                 accept = 0;
 
-        printf("lowest: %d, highest: %d\n", lowest, lowest + (19 - i));
+        printf("accept: %d, lowest: %d, highest: %d, seq: %d\n", accept, lowest, lowest + (19 - i), seq);
         return accept;
 }
 
