@@ -269,7 +269,7 @@ int print_list(linklist *list)
 {
         node *ptr;
         int seq;
-        float time;
+        long time;
         int i = 0;
         printf("list len is %d\n", list->len);
         ptr = list->head;
