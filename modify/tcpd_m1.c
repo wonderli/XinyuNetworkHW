@@ -234,17 +234,21 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                                 }
                                         }
                                 }//end if ack_flag
-//                                else if(ack_buffer_flag == TRUE)
-//                                {
-//                                        printf("\nACK FOR DUPLICATE AGAIN\n");
-//                                        ack.packet.ack = 1;
-//                                        ack.packet.ack_seq = recv_buffer[head].packet.seq_num;
-//                                        ack.tcpd_header = ack_addr;
-//                                        ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
-//                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
-//                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
-//                                        printf("\nSEND ACK SEQ %d, TO TROLL M1\n", ack.packet.ack_seq);
-//                                }
+                                else if(ack_buffer_flag == TRUE)
+                                {
+                                        printf("\nACK FOR DUPLICATE AGAIN\n");
+                                        ack.packet.ack = 1;
+                                        ack.packet.ack_seq = recv_buffer[head].packet.seq_num;
+                                        ack.tcpd_header = ack_addr;
+                                        ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
+                                        if(sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr)) < 0)
+                                        {
+                                                perror("send to sock_ack error");
+                                                exit(0);
+                                        }
+                                        printf("\nSEND ACK SEQ %d, TO TROLL M1\n", ack.packet.ack_seq);
+                                }
 //                }
 //                else
 //                {

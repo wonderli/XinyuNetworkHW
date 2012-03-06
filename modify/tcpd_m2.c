@@ -277,7 +277,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 			
 			ptr++;//move window index
 			head = (head + 1) % 64;//wrap buffer
-			if(ptr >= window_end)
+			if(ptr > window_end)
 			{
 				printf("\nWINDOW FULL, SLEEP\n");
 				control_msg.packet.stop = 1;
