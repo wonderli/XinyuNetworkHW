@@ -182,11 +182,11 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         }
                         printf("\nRECV FROM TROLL_M2, SEQ:%d\n", recv_buffer[head].packet.seq_num);
 
-                        //checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
+                        checksum = cal_crc((void *)&recv_buffer[head].packet, sizeof(struct packet_data));//CRC
 
                         //printf("\nCAL CHECKSUM: %lu, RECV CHECKSUM: %lu\n", checksum, recv_buffer[head].checksum);
-//                        if(checksum == recv_buffer[head].checksum)
-//                        {
+                        if(checksum == recv_buffer[head].checksum)
+                        {
 //                                crc_match = TRUE;
                                 ack_buffer_flag = FALSE;//CHECK FOR DUP
 //
@@ -249,7 +249,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                         }
                                         printf("\nSEND ACK SEQ %d, TO TROLL M1\n", ack.packet.ack_seq);
                                 }
-//                }
+                }
 //                else
 //                {
 //                        crc_match = FALSE;//checksum wrong
