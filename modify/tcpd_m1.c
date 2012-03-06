@@ -83,6 +83,9 @@ int is_acceptable_seq(int seq)
                 }
         }
 
+        if (lowest_idx < 0)
+                return 1;
+
         if (seq < lowest_idx)
                 return 0;
         if (seq > lowest + (19 - i))
