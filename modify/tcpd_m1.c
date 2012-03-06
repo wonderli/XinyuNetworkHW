@@ -82,7 +82,7 @@ int is_acceptable_seq(int seq)
         } else {
                 lowest_seq = (lastsent / 20) * 20;
                 highest_seq = lowest_seq + 20;
-                if (seq < lowest_seq || seq > highest_seq)
+                if (seq < lowest_seq || seq >= highest_seq)
                         accept = 0;
                 else
                         accept = 1;
