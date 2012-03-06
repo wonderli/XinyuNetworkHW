@@ -24,7 +24,7 @@ int main()
                 perror("opening datagram socket for recv from tcpd_m1");
         }
         timer_recv_addr.sin_family = AF_INET;
-        timer_recv_addr.sin_port = htons(TIMER_SEND_PORT);
+        timer_recv_addr.sin_port = htons(TIMER_SERVER_PORT);
         timer_recv_addr.sin_addr.s_addr = INADDR_ANY;
 	
 //        printf("PORT IS %d\n", timer_addr.sin_port);
@@ -42,7 +42,7 @@ int main()
                 perror("sock_timer_send sock failed )");
         }
         timer_send_addr.sin_family = AF_INET;
-        timer_send_addr.sin_port = htons(TIMER_RECV_PORT);
+        timer_send_addr.sin_port = htons(TIMER_CLIENT_PORT);
         timer_send_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 

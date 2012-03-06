@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         struct timeval time_start, time_end, diff;
         float start, end;
 	float time_rem = 0;
-        int resend_pkt;
+        int resend_pkt = -1;
         int head = 0;
         int tail = 0;
         int ptr = 0;
@@ -136,7 +136,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(1);
         }
         timer_send_addr.sin_family = AF_INET;
-        timer_send_addr.sin_port = htons(TIMER_SEND_PORT);
+        timer_send_addr.sin_port = htons(TIMER_SERVER_PORT);
         timer_send_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
         if((sock_timer_recv = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                 exit(1);
         }       
         timer_recv_addr.sin_family = AF_INET;
-        timer_recv_addr.sin_port = htons(TIMER_RECV_PORT);
+        timer_recv_addr.sin_port = htons(TIMER_CLIENT_PORT);
         timer_recv_addr.sin_addr.s_addr = INADDR_ANY;
 
         if(bind(sock_timer_recv, (struct sockaddr *)&timer_recv_addr, sizeof(timer_recv_addr)) < 0) {
@@ -367,43 +367,49 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 				}//END ACKMSG FIN_ACK
 			}//END ACKMSG CHECKSUM
 
-			// IF PACKET EXPIRED
-			if(FD_ISSET(sock_timer_recv, &read_fds))
-			{
-				
-				if(recvfrom(sock_timer_recv, &timer_recv, sizeof(timer_recv), 0, (struct sockaddr *)&timer_recv_addr, &timer_recv_addr_len) > 0)
-				{
-					printf("\n PACKET SEQ NUM: %d HAS EXPIRED\n", timer_recv.seq);
-
-				}
-				for(i = 0; i < 20; i++)//ITERATE WINDOW
-				{
-					if(window[i] == timer_recv.seq)
-					{
-						for(j = 0; j < 64; j++)
-						{
-
-							if((buffer[j].packet.seq_num == timer_recv.seq) && (buffer[j].packet.seq_num != -1))
-							{
-								printf("\nRESEND TO BUFFER\n");
-								resend_pkt = j;
-							}
-						}//END
-					}//END if window
-				}//END ITERATE
-
-				sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
-
-				gettimeofday(&time_start, NULL);
-				timer_send.time = RTO(time_rem, buffer[resend_pkt].packet.seq_num);
-				timer_send.seq = buffer[resend_pkt].packet.seq_num;
-				timer_send.action = START;
-				sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(timer_send_addr));
-			}
 		}
+                // IF PACKET EXPIRED
+                if(FD_ISSET(sock_timer_recv, &read_fds))
+                {
+                        printf("\nIn timer recv\n");
+                        
+                        if(recvfrom(sock_timer_recv, &timer_recv, sizeof(timer_recv), 0, (struct sockaddr *)&timer_recv_addr, &timer_recv_addr_len) > 0)
+                        {
+                                printf("\n PACKET SEQ NUM: %d HAS EXPIRED\n", timer_recv.seq);
+
+                        }
+                        for(i = 0; i < 20; i++)//ITERATE WINDOW
+                        {
+                                if(window[i] == timer_recv.seq)
+                                {
+                                        for(j = 0; j < 64; j++)
+                                        {
+
+                                                if((buffer[j].packet.seq_num == timer_recv.seq) && (buffer[j].packet.seq_num != -1))
+                                                {
+                                                        printf("\nRESEND TO BUFFER\n");
+                                                        resend_pkt = j;
+                                                }
+                                        }//END
+                                }//END if window
+                        }//END ITERATE
+
+                        if(resend_pkt != -1)
+                        {
+                                sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
+
+                                gettimeofday(&time_start, NULL);
+                                timer_send.time = RTO(time_rem, buffer[resend_pkt].packet.seq_num);
+                                timer_send.seq = buffer[resend_pkt].packet.seq_num;
+                                timer_send.action = START;
+                                sendto(sock_timer_send, &timer_send, sizeof(timer_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(timer_send_addr));
+                                resend_pkt = -1;
+                        }
+                }
+
 		FD_ZERO(&read_fds);
 		FD_SET(sock_ftpc, &read_fds);
-		FD_SET(sock_timer_recv, &read_fds);
 		FD_SET(sock_ack, &read_fds);
+		FD_SET(sock_timer_recv, &read_fds);
         }
 }
