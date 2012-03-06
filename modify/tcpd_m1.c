@@ -90,7 +90,7 @@ int is_acceptable_seq(int seq)
 
         printf("----------------------\n");
         print_win();
-        printf("accept: %d, lowest: %d, highest: %d, seq: %d\n", accept, lowest_seq, highest_seq, seq);
+        printf("accept: %d, lowest: %d, highest: %d, seq: %d, lastsent: %d\n", accept, lowest_seq, highest_seq, seq, lastsent);
         printf("----------------------\n");
         return accept;
 }
