@@ -237,6 +237,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = cal_crc((void *)&buffer[head].packet, sizeof(struct packet_data));
+                        printf("\nNOW THE WINDOW IS:\n");
+                        print_win();
                         for(i = 0; i < 64; i++)
                         {
                                 if(buffer[i].packet.seq_num == window[ptr])
