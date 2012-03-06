@@ -174,7 +174,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                 if ((nread = read (send_file, read_file_buf, MAXBUF)) < MAXBUF)
                                 {
                                         send_msg.packet.seq_num++;
-                                        send_msg.packet.length = nread;
+                                        send_msg.packet.length = nread;                                        
                                         bcopy(read_file_buf,send_msg.packet.data,nread);
                                         usleep(10000);
                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
@@ -187,6 +187,7 @@ int file_send (int sck, int control_sck, char *filename, struct sockaddr_in sin_
                                 {
                                         send_msg.packet.seq_num++;
                                         send_msg.packet.length = nread;
+                                        send_msg.packet.fin = 0;
                                         bcopy(read_file_buf,send_msg.packet.data,MAXBUF);
                                         usleep(10000);
                                         SEND (sck, (char *)&send_msg, sizeof(send_msg), 0);
