@@ -30,6 +30,7 @@ linklist* create_list()
         }
         else
         perror("creat list malloc error");
+        return new_list;
 }
 /* Insert new node and update list */
 int insert_node(linklist *list, node *insert_node)
