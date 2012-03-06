@@ -140,9 +140,13 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 		exit(1);
 	}
 
+//	troll_m1_addr.sin_family = AF_INET;
+//	troll_m1_addr.sin_port = htons(TROLL_PORT_M1);
+//	troll_m1_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
 	troll_m1_addr.sin_family = AF_INET;
-	troll_m1_addr.sin_port = htons(TROLL_PORT_M1);
+	troll_m1_addr.sin_port = htons(TCPD_PORT_M2);
 	troll_m1_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
+
 
 	//Contruct troll header
 	ack_addr.sin_family = AF_INET;
@@ -150,7 +154,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 	bcopy(hp->h_addr, (void*)&ack_addr.sin_addr, hp->h_length);
 
         ftps_addr.sin_family = AF_INET;
-	ftps_addr.sin_port = htons(TCPD_PORT);
+	//ftps_addr.sin_port = htons(TCPD_PORT);
+	ftps_addr.sin_port = htons(TCPD_PORT_FTPS);
 	ftps_addr.sin_addr.s_addr = inet_addr("127.0.0.1");     
 
         //GET LEN FOR RECVFROM
@@ -166,13 +171,13 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
         while(1)
         {
-                //if(select(FD_SETSIZE, &read_fds, NULL, NULL, NULL) < 0)
-                //{
-                //        perror("SELECT ERROR");
-                //        exit(0);
-                //}
-                //if(FD_ISSET(sock_from_troll_m2, &read_fds))
-                //{
+                if(select(FD_SETSIZE, &read_fds, NULL, NULL, NULL) < 0)
+                {
+                        perror("SELECT ERROR");
+                        exit(0);
+                }
+                if(FD_ISSET(sock_from_troll_m2, &read_fds))
+                {
 
                         if(recvfrom(sock_from_troll_m2, (void *)&recv_buffer[head], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m2_addr, &from_troll_addr_len) < 0)
                         {
@@ -255,8 +260,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         crc_match = FALSE;//checksum wrong
                 }
 //
-//                if(crc_match == TRUE)
-                if(1)
+                if(crc_match == TRUE)
+//                if(1)
                 {
 //                        printf("\nENTER IF CRC_MATCH\n");
 //                        //find the lowest window seq;
@@ -305,7 +310,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 {
                                         ack.packet.ack = 1;
                                         ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
-//                                        //lastsent = recv_buffer[buffer_index].packet.seq_num;
+/////////                                        //lastsent = recv_buffer[buffer_index].packet.seq_num;
 //                                        printf("\nLAST SENT: %d\n", lastsent);
 //                                        printf("\nACK.PACKET.ACK_SEQ: %d\n", ack.packet.ack_seq);
                                         ack_buffer[pointer] = recv_buffer[buffer_index].packet.seq_num;
@@ -332,37 +337,37 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 else
                                 {
                                         printf("\nRECEIVE FIN!!! seq: %d\n", recv_buffer[buffer_index].packet.seq_num);
-//                                        sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
+                                        sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
 //                                        //sendto(sock_ftps, (void*)&recv_buffer[buffer_index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&ftps_addr, sizeof(ftps_addr));
-//                                        ack.tcpd_header = ack_addr;
-//                                        ack.packet.fin_ack = 1;
-//                                        ack.packet.ack = 0;
-//                                        ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
-//                                        ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
-//                                        window_srv[lowest_seq_window_index] = -1;
-//                                        strcpy(ack.packet.data, "FIN");
-//                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
-//                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
-//                                        printf("\nFINISH TRANSFER FILE\n");
-//                                        close(sock_ack);
-//                                        close(sock_from_troll_m2);
-//                                        close(sock_ftps);
+                                        ack.tcpd_header = ack_addr;
+                                        ack.packet.fin_ack = 1;
+                                        ack.packet.ack = 0;
+                                        ack.packet.ack_seq = recv_buffer[buffer_index].packet.seq_num;
+                                        ack.checksum = cal_crc((void *)&ack.packet, sizeof(struct packet_data));
+                                        window_srv[lowest_seq_window_index] = -1;
+                                        strcpy(ack.packet.data, "FIN");
+                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
+                                        sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
+                                        printf("\nFINISH TRANSFER FILE\n");
+                                        close(sock_ack);
+                                        close(sock_from_troll_m2);
+                                        close(sock_ftps);
                                         exit(0);
                                 }
                         }//END IF LAST SENT
-//                        else
-//                        {
-//                                printf("\nSLEEP FOR WAITING\n");
-//                                usleep(100000);
-//                        }//END LOW
+                        else
+                        {
+                                printf("\nSLEEP FOR WAITING\n");
+                                usleep(100000);
+                        }//END LOW
                 }
-//                else if(crc_match == FALSE)
-//                {
-//                        printf("\nCRC WRONG, RETRANSMIT\n");
-//                }
-//           }
-//           FD_ZERO(&read_fds);
-//           FD_SET(sock_from_troll_m2,&read_fds);
+                else if(crc_match == FALSE)
+                {
+                        printf("\nCRC WRONG, RETRANSMIT\n");
+                }
+           }
+           FD_ZERO(&read_fds);
+           FD_SET(sock_from_troll_m2,&read_fds);
       }
 
 }

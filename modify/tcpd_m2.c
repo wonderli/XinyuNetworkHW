@@ -160,9 +160,13 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         }
 
         /* create troll_addr with parameters */
+//        troll_addr.sin_family = AF_INET;
+//        troll_addr.sin_port = htons(TROLL_PORT_M2);
+//        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         troll_addr.sin_family = AF_INET;
-        troll_addr.sin_port = htons(TROLL_PORT_M2);
+        troll_addr.sin_port = htons(TCPD_PORT_M1);
         troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
 
         struct hostent *hp;
         hp = gethostbyname(argv[1]);
@@ -257,10 +261,10 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                        printf("\nINDEX IS %d, SEQ: %d\n", index, buffer[index].packet.seq_num);
 
                         //index = locate_in_buffer(window[ptr]);
-                        if(buffer[index].packet.seq_num > STOP_SEQ)
-                        {
-                                exit(0);
-                        }
+//                        if(buffer[index].packet.seq_num > STOP_SEQ)
+//                        {
+//                                exit(0);
+//                        }
                         if(sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len)<0)
                         {
                                 perror("SEND SEQ ERROR");
