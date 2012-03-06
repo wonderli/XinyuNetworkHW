@@ -277,7 +277,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 
 			gettimeofday(&time_start, NULL);
 			timer_send.seq = buffer[index].packet.seq_num;
-			timer_send.time = RTO(time_rem, buffer[index].packet.seq_num);
+			timer_send.time = RTO(time_rem, buffer[index].packet.seq_num)*10;
 			timer_send.action = START;
 			//timer_send.time = 200000;
                         printf("\nSEND SEQ: %d to TIMER\n", timer_send.seq);
@@ -308,6 +308,8 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         printf("\nGET ACK\n");
 			gettimeofday(&time_end, NULL);
 			time_rem = RTT(&time_start, &time_end);
+                        printf("\n RTT IS %f\n", time_rem);
+
 
 			recvfrom(sock_ack, (void*)&ack_msg, sizeof(TCPD_MSG),0, (struct sockaddr *)&ack_addr, &ack_addr_len);
 			recv_checksum = cal_crc((void*)&ack_msg.packet, sizeof(struct packet_data));
@@ -403,7 +405,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                                 sendto(sock_troll, (void *)&buffer[resend_pkt], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, sizeof(troll_addr));
 
                                 gettimeofday(&time_start, NULL);
-                                timer_send.time = RTO(time_rem, buffer[resend_pkt].packet.seq_num);
+                                timer_send.time = RTO(time_rem, buffer[resend_pkt].packet.seq_num)*10;
                                 timer_send.seq = buffer[resend_pkt].packet.seq_num;
                                 timer_send.action = START;
                                 //timer_send.time = 200000;

@@ -52,8 +52,8 @@ float RTO(float M, int packet_ctrl)
 	int RTO = 0;
 	if(packet_ctrl == 0)
 	{
-		//RTO = 6000;
-		RTO = 200000000;
+		RTO = 60000;
+		//RTO = 200000000;
 		return RTO;
 	}
 	else if(packet_ctrl == 1)
@@ -61,7 +61,7 @@ float RTO(float M, int packet_ctrl)
 		A = 50;
 		if(M == 0)
 		{
-			RTO = 6000;
+			RTO = 60000;
 			return RTO;
 		}
 		else 
