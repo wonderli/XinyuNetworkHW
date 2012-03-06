@@ -330,7 +330,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //					printf("\nACK CHECKSUM %d\n", ack.checksum);
                                         ack.tcpd_header = ack_addr; 
 //                                        //sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&ack_addr, sizeof(ack_addr));
-                                        if(ack.packet.ack_seq != 5)
+                                        if(ack.packet.ack_seq % 5 == 0)
                                         {
                                                 sendto(sock_ack, (void *)&ack, sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_m1_addr, sizeof(troll_m1_addr));
                                         }

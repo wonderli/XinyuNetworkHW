@@ -72,5 +72,5 @@ linklist* create_list();
 int insert_node(linklist *list, node *insert_node);
 int cancel_node(linklist *list, int seq);
 int remove_node(node *remove_node);
-void print_list(linklist *list);
+int print_list(linklist *list);
 

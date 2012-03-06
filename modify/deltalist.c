@@ -33,18 +33,61 @@ linklist* create_list()
         return new_list;
 }
 /* Insert new node and update list */
-int insert_node(linklist *list, node *insert_node)
+int insert_node(linklist *list, node *n)
 {
         node *head = list->head;
         node *tail = list->tail;
         node *ptr = head;
+
+	long dtime = n->time;
+        list->len++;
+
+        //printf("Insert node :%d, %d\n", n->seq, n->time);
+
+	if (head == NULL) {
+		list->head = n;
+		list->tail = n;
+		return TRUE;
+	}
+
+	for (ptr = head; ptr != NULL; ptr = ptr->next) {
+		if (ptr->time > dtime) {
+			break;
+		}
+		dtime -= ptr->time;
+	}
+
+	n->next = ptr;
+	n->time = dtime;
+	if (ptr == NULL) {
+		n->prev = tail;
+		list->tail = n;
+                tail->next = n;
+
+		return TRUE;
+	}
+        n->prev = ptr->prev;
+        if (ptr->prev != NULL) {
+                ptr->prev->next = n;
+        }
+        ptr->prev = n;
+        if (ptr->next != NULL) {
+                ptr->next->prev = n;
+        }
+
+	for (; ptr != NULL; ptr = ptr->next) {
+		list->tail = ptr;
+		ptr->time -= dtime;
+		dtime = 0;
+	}
+
+	/*
         if(head == NULL)
         {
                 list->head = insert_node;
                 list->tail = insert_node;
                 list->len++;
-        }else if(insert_node->time <= head->time)
-        {
+        } else if(insert_node->time <= head->time) {
                 if(insert_node->seq == ptr->seq)
                 {
                         printf("This seq %d node has already exits.", insert_node->seq);
@@ -61,7 +104,6 @@ int insert_node(linklist *list, node *insert_node)
         {
                 while(ptr != NULL)
                 {
-                        /* inset node seq equals ptr seq*/
                         if(insert_node->seq == ptr->seq)
                         {
                         
@@ -91,6 +133,7 @@ int insert_node(linklist *list, node *insert_node)
 
                 }
         }
+	*/
 
         return TRUE;
 }
@@ -101,6 +144,51 @@ int cancel_node(linklist *list, int seq)
         node* head = list->head;
         node* tail = list->tail;
         node* ptr = list->head;
+
+        node *found = NULL;
+        long dtime = 0;
+
+        for (ptr = list->head; ptr != NULL; ptr = ptr->next) {
+                if (ptr->seq == seq) {
+                        found = ptr;
+                        break;
+                }
+        }
+
+        if (found == NULL) {
+                return FALSE;
+        }
+
+        list->len--;
+
+        dtime = found->time;
+
+        if (found->prev != NULL) {
+                found->prev->next = found->next;
+        }
+        if (found->next != NULL) {
+                found->next->prev = found->prev;
+        }
+
+        if (found == head) {
+                list->head = NULL;
+                list->tail = NULL;
+                return TRUE;
+        }
+
+        list->tail = found->next;
+
+        for (ptr = found->next; ptr != NULL; ptr = ptr->next) {
+                ptr->time += dtime;
+                dtime = ptr->time;
+                list->tail = ptr;
+        }
+
+        if (list->tail == NULL) {
+                list->tail = found->prev;
+        }
+
+        /*
         if(ptr == NULL)
         {
                 printf("Node num %d doesn't exists", seq);
@@ -108,7 +196,7 @@ int cancel_node(linklist *list, int seq)
         else if(head->seq == seq)
         {
                 ptr = ptr->next;
-                if(ptr == NULL)/* list only have one node*/
+                if(ptr == NULL)
                 {
                         list->head = NULL;
                         list->tail = NULL;
@@ -144,11 +232,14 @@ int cancel_node(linklist *list, int seq)
                                 tmp_next->prev = tmp_prev;
                                 tmp_next->time = tmp_next->time + ptr->time;
                                 remove_node(ptr);
+				ptr = tmp_next;
                                 list->len--;
-                        }
-                        ptr = ptr->next;
+                        } else {
+				ptr = ptr->next;
+			}
                 }
         }
+        */
 return TRUE;
 
 
@@ -165,16 +256,17 @@ int remove_node(node *remove_node)
                 free(remove_node);    
         }
         else
-        perror("remove_node error");
+		perror("remove_node error");
         return TRUE;
 }
 
 /* Print list */
-void print_list(linklist *list)
+int print_list(linklist *list)
 {
         node *ptr;
         int seq;
         float time;
+        int i = 0;
         printf("list len is %d\n", list->len);
         ptr = list->head;
         while(ptr != NULL)
@@ -183,8 +275,14 @@ void print_list(linklist *list)
                 time = ptr->time;
                 printf("(%d, %f)->", seq, time);
                 ptr = ptr->next;
+                i++;
         }
         printf("\n");
+        if (i != list->len) {
+                printf("ERROR: len should be %d\n", i);
+                return -1;
+        }
+        return 0;
 }
 
 /* Test the head of this list whether expired or not*/
@@ -203,17 +301,41 @@ int expire(linklist *list)
 	}
 	return FALSE;
 }
-//int main()
-//{
-//        linklist *List = create_list();
-//        node* a = creat_node(1, 32);
-//        node* b = creat_node(2, 44);
-//        node* c = creat_node(3, 324);
-//        insert_node(List, a);
-//        insert_node(List, b);
-//        insert_node(List, c);
-//        cancel_node(List, 3);
-//        print_list(List);
-//        return 0;
-//}
-//
+
+int insert_and_print(linklist *List, int seq, int time) {
+        node* a = creat_node(seq, time);
+        printf("INSERT: %d %d\n", seq, time);
+        insert_node(List, a);
+        print_list(List);
+        printf("-----------------\n");
+	return 0;
+}
+
+int cancel_and_print(linklist *List, int seq) {
+        printf("CANCEL: %d\n", seq);
+        cancel_node(List, seq);
+        print_list(List);
+        printf("-----------------\n");
+	return 0;
+}
+
+int main()
+{
+        linklist *List = create_list();
+
+        insert_and_print(List, 1, 359);
+        insert_and_print(List, 2, 9403);
+        insert_and_print(List, 3, 9403);
+        insert_and_print(List, 4, 9403);
+        insert_and_print(List, 5, 9403);
+        cancel_and_print(List, 5);
+        insert_and_print(List, 6, 9270);
+        insert_and_print(List, 7, 9270);
+        insert_and_print(List, 8, 9270);
+        insert_and_print(List, 9, 9270);
+        insert_and_print(List, 10, 9270);
+        cancel_and_print(List, 10);
+
+        return 0;
+}
+

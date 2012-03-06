@@ -80,12 +80,12 @@ int main()
                         //print_list(time_list);
                         if(time_msg_recv.action == CANCEL) /* Cancel node*/
                         {
-                                printf("\ncancel node\n");
+                                printf("\ncancel node: %d\n", time_msg_recv.seq);
                                 cancel_node(time_list, time_msg_recv.seq);
                                 print_list(time_list);
                         }else if(time_msg_recv.action == START) /* Add node for timing */
                         {
-                                printf("\nstart node\n");
+                                printf("\nstart node: %d; time: %d\n", time_msg_recv.seq, time_msg_recv.time);
                                 node *new_node = creat_node(time_msg_recv.seq, time_msg_recv.time);
                                 insert_node(time_list, new_node);
                                 print_list(time_list);
@@ -108,42 +108,44 @@ int main()
                                 gettimeofday(&tv2, &tz);
                                 node *expire_node, *ptr;
                                 ptr = time_list->head;
-                                while(ptr && ptr->time <= 0)
-                                {
+                                while(ptr != NULL) {
                                         expire_node = ptr;
                                         ptr = ptr->next;
-                                        time_msg_send.seq = expire_node->seq;
-                                        time_msg_send.action = EXPIRE;
-                                        time_msg_send.time = 0;
-                                        printf("\nBEGIN REMOVE NODE\n");
-                                        if (expire_node->prev != NULL) {
-                                                expire_node->prev->next = expire_node->next;
+                                        if (expire_node->time <= 0) {
+                                                time_msg_send.seq = expire_node->seq;
+                                                time_msg_send.action = EXPIRE;
+                                                time_msg_send.time = 0;
+                                                //printf("\nBEGIN REMOVE NODE\n");
+                                                if (expire_node->prev != NULL) {
+                                                        expire_node->prev->next = expire_node->next;
+                                                }
+                                                if (expire_node->next != NULL) {
+                                                        expire_node->next->prev = expire_node->prev;
+                                                }
+                                                remove_node(expire_node);
+                                                //cancel_node(time_list,expire_node);
+                                                time_list->len--;
+                                                if (time_list->len <= 0) {
+                                                        time_list->head = NULL;
+                                                }
+                                                
+                                                again:
+                                                if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0)
+                                                {
+                                                       if(errno == EINTR) goto again;
+                                                        perror("\nTIMER SEND ERROR\n");
+                                                        exit(1);
+                                                }
+                                                //printf("\nREMOVE NODE\n");
                                         }
-                                        if (expire_node->next != NULL) {
-                                                expire_node->next->prev = expire_node->prev;
-                                        }
-                                        remove_node(expire_node);
-                                        //cancel_node(time_list,expire_node);
-                                        time_list->len--;
-                                        if (time_list->len <= 0) {
-                                                time_list->head = NULL;
-                                        }
-                                        
-                                        again:
-                                        if(sendto(sock_timer_send, (void *)&time_msg_send, sizeof(time_msg_send), 0, (struct sockaddr*)&timer_send_addr, sizeof(struct sockaddr_in)) < 0)
-                                        {
-                                               if(errno == EINTR) goto again;
-                                                perror("\nTIMER SEND ERROR\n");
-                                                exit(1);
-                                        }
-                                        printf("\nREMOVE NODE\n");
-                                        print_list(time_list);
                                 }
-                                time_list->head = ptr;
                                 if(time_list->head == NULL)
                                 {
                                         time_list->tail = NULL;
                                 }
+                                printf("After removed expired nodes: \n");
+                                print_list(time_list);
+                                printf("--------------------------\n");
                         }
                 }
                         /* Print deltalist */
