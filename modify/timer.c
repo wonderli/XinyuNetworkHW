@@ -107,7 +107,7 @@ int main()
                         }
                 }
 //                timeout.tv_usec = 1*1e5;
-                if(expire(time_list))
+                while (expire(time_list))
                 {
                         node *expire_node, *ptr;
                         long dtime;
@@ -190,16 +190,16 @@ int main()
                                 time_list->tail = NULL;
                         }
                         */
-                        printf("--------------------------\n");
-                        printf("After removed expired nodes: \n");
-                        print_list(time_list);
-                        printf("--------------------------\n");
                 }
                         /* Print deltalist */
 //                        if(time_list->head != NULL)
 //                        {
 //                                print_list(time_list);
 //                        }
+                printf("--------------------------\n");
+                printf("After removed expired nodes: \n");
+                print_list(time_list);
+                printf("--------------------------\n");
                 if (time_list->head == NULL) {
                         timeout.tv_sec = 1;
                         timeout.tv_usec = 0;
