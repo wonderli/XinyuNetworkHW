@@ -160,12 +160,12 @@ int main(int argc, char* argv[]) /* server program called with no argument */
         }
 
         /* create troll_addr with parameters */
-//        troll_addr.sin_family = AF_INET;
-//        troll_addr.sin_port = htons(TROLL_PORT_M2);
-//        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         troll_addr.sin_family = AF_INET;
-        troll_addr.sin_port = htons(TCPD_PORT_M1);
+        troll_addr.sin_port = htons(TROLL_PORT_M2);
         troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+//        troll_addr.sin_family = AF_INET;
+//        troll_addr.sin_port = htons(TCPD_PORT_M1);
+//        troll_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 
         struct hostent *hp;
