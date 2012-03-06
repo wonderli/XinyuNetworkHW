@@ -77,7 +77,7 @@ int is_acceptable_seq(int seq)
         int highest_seq;
         int accept = 1;
 
-        if (lastsent < 0) {
+        if (lastsent < 0 || (lastsent + 1) % 20 == 0) {
                 accept = 1;
         } else {
                 lowest_seq = (lastsent / 20) * 20;
