@@ -7,6 +7,7 @@
 #define STOP_SEQ 60
 struct TCPD_MSG buffer[64];
 int window[20];
+int nr_crc_failed = 0;
 int locate_in_buffer(int seq_num)
 {
         int i = 0;
@@ -252,7 +253,7 @@ int main(int argc, char* argv[]) /* server program called with no argument */
                         window[ptr] = buffer[head].packet.seq_num;
                         buffer[head].tcpd_header = ftps_addr;
                         buffer[head].checksum = cal_crc((void *)&buffer[head].packet, (unsigned char)sizeof(struct packet_data));
-                        printf("\nCRC IS %ud\n", buffer[head].checksum);
+                        printf("\nCRC IS %u\n", buffer[head].checksum);
                         for(i = 0; i < 64; i++)
                         {
                                 if(buffer[i].packet.seq_num == window[ptr])
@@ -269,12 +270,28 @@ int main(int argc, char* argv[]) /* server program called with no argument */
 //                        {
 //                                exit(0);
 //                        }
-                        if(sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len)<0)
-                        {
-                                perror("SEND SEQ ERROR");
-                                exit(0);
-                        }
-                        printf("\nSENDING SEQ: %d\n", buffer[index].packet.seq_num);
+//                        if(buffer[index].packet.seq_num / 5 == 0 && nr_crc_failed < 1)
+//                        {
+//                                buffer[index].checksum = 0;
+//                                nr_crc_failed ++;
+//                                
+//                                if(sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len)<0)
+//                                {
+//                                        perror("SEND SEQ ERROR");
+//                                        exit(0);
+//                                }
+//                                printf("\nSENDING SEQ: %d\n", buffer[index].packet.seq_num);
+//                        }else
+//                        {
+                                if(sendto(sock_troll, (void *)&buffer[index], sizeof(TCPD_MSG), 0, (struct sockaddr *)&troll_addr, troll_addr_len)<0)
+                                {
+                                        perror("SEND SEQ ERROR");
+                                        exit(0);
+                                }
+                                printf("\nSENDING SEQ: %d\n", buffer[index].packet.seq_num);
+
+
+//                        }
 
 			gettimeofday(&time_start, NULL);
 			timer_send.seq = buffer[index].packet.seq_num;

@@ -1,4 +1,12 @@
 #include "tcpd.h"
+int SOCKET(int domain, int type, int protocol)
+{
+        return socket(domain, type, protocol);
+}
+int BIND(int socket, const struct sockaddr *address, socklen_t address_len)
+{
+	return bind(socket, address, address_len);
+}
 int SEND(int socket, const void *buffer, size_t len, int flags) {
 	struct sockaddr_in srv_addr;
 //	struct hostent *hp;

@@ -40,6 +40,8 @@ typedef struct troll_msg {
 	struct TCPD_MSG tcpd_msg;
 } TROLL_MSG;
 
+int SOCKET(int domain, int type, int protocol);
+int BIND(int socket, const struct sockaddr *address, socklen_t address_len);
 int SEND(int socket, const void *buffer, size_t len, int flags);
 int RECV(int socket, void *buffer, size_t length, int flags);
 int RECV_CONTROL(int socket, void *buffer, size_t len, int flags);

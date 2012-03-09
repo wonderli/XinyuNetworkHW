@@ -37,7 +37,8 @@ int main(int argc, char *argv[])
 
 	/*initialize socket connection in unix domain*/
 	/*if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){ */
-	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+	//if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+	if((sock = SOCKET(AF_INET, SOCK_DGRAM, 0)) < 0){
 		perror("error openting datagram socket");
 		exit(1);
 	}
@@ -58,7 +59,8 @@ int main(int argc, char *argv[])
         }
 
 	/* bind socket name to socket */
-	if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
+	//if(bind(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
+	if(BIND(sock, (struct sockaddr *)&sin_addr, sizeof(struct sockaddr_in)) < 0) {
 		perror("error binding stream socket");
 		exit(1);
 	}

@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
 	strcpy(filename, argv[3]);
 	/* initialize socket connection in unix domain */
 	/*if((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0){*/
-	if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+	//if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+	if((sock = SOCKET(AF_INET, SOCK_DGRAM, 0)) < 0){
 		perror("error openting datagram socket");
 		exit(1);
 	}
@@ -60,7 +61,8 @@ int main(int argc, char *argv[])
         tcpd_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
         
         int sock_control;
-        if((sock_control = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+        //if((sock_control = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+        if((sock_control = SOCKET(AF_INET, SOCK_DGRAM, 0)) < 0){
                 perror("error openting datagram socket");
                 exit(1);
         }
@@ -68,7 +70,8 @@ int main(int argc, char *argv[])
         control_addr.sin_port = htons(CONTROL_PORT);
         control_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-        if(bind(sock_control, (struct sockaddr *)&control_addr, sizeof(struct sockaddr_in)) < 0) {
+        //if(bind(sock_control, (struct sockaddr *)&control_addr, sizeof(struct sockaddr_in)) < 0) {
+        if(BIND(sock_control, (struct sockaddr *)&control_addr, sizeof(struct sockaddr_in)) < 0) {
 		perror("error binding stream socket");
 		exit(1);
 	}
